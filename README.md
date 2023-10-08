@@ -15,6 +15,7 @@ Hello! I'm Brandon Henley, a biomedical engineer with a background in physiologi
 ## 2. Time Series Analysis and Forecasting
 
 ### 2.1 Cardo: Closed-loop Model of the Baroreflex
+Beat-to-beat time series data of systemic arterial blood pressure and heart rate may be used to model the baroreflex in humans. Using publicly available electrocardiophy and continuous blood pressure recorders from 100 participants, this project develops a closed loop model of the dynamic relation between blood pressure and heart rate to obtain a quantitative measure of the sympathetic and parasympathic pathway of the baroreflex.
 
 ### 2.2 Diabetes: Blood Glucose Level Forecasting
 Predicting blood glucose levels is crucial for diabetic patients in planning their meal and insulin doses. The application of a CNN-LSTM model to this problem showcases the convergence of biomedical data with advanced machine learning techniques for practical healthcare implications. I use continuous blood glucose level, insulin doses, and dietary intake data to develop a CNN-LSTM model in PyTorch that forecasts 90 minutes of blood glucose levels, achieving an RMSE of 24.8 mg/dl.
