@@ -1,6 +1,6 @@
 # Brandon Henley's Machine Learning Portfolio
 
-Hello! I'm Brandon Henley, a biomedical engineer with a background in physiological system modeling and signal processing. I'm currently embarking on a career transition to bridge my research skills into practical industry applications, especially in the areas of machine learning and artificial intelligence. This repository showcases some of the projects I've undertaken during this transition phase.
+Hi! I'm Brandon Henley, a biomedical engineer. This repository showcases some of the projects I've undertaken in machine learning and artificial intelligence.
 
 ## Table of Contents
 1. [Contact Information](#contact-information)
