@@ -1,3 +1,6 @@
+import nibabel as nib
+import numpy as np
+
 def get_images(image_path, dtype=np.float32):
   # Load the NIfTI file using nibabel
   images = nib.load(image_path)
