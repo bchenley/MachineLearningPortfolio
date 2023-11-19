@@ -1,3 +1,7 @@
+SimpleITK as sitk
+import numpy as np
+import torch as torch
+
 def register_image(fixed_image, moving_image,
                    transform_type = 'similarity',
                    metric = 'mmi',
