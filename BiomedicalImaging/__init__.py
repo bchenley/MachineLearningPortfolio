@@ -2,7 +2,7 @@ print("Initializing BiomedicalImaging package...")
 
 import importlib
 
-__all__ = ['acces_images',
+__all__ = ['access_images',
            'get_images',
            'register_image',
            'register_subject_images']
