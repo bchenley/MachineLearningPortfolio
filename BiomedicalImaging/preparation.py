@@ -2,7 +2,7 @@
 import os, random, pickle
 
 ## import access_images
-from BiomedicalImaging.access_images import access_images
+import access_images
 
 # Get user input for a given prompt
 def get_user_input(prompt):
