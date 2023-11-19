@@ -1,3 +1,6 @@
+import SimpleITK as sitk
+import numpy as np
+
 def register_subject_images(images,
                             fixed_image_idx = 0,
                             normalize_images = False,
@@ -24,12 +27,8 @@ def register_subject_images(images,
         scaler = MinMaxScaler(feature_range = (0, 1))
 
         image_i = subject_images['image'][:, :, :, i]
-        if isinstance(image_i, torch.Tensor):
-          image_is = torch.tensor(scaler.fit_transform(image_i.cpu().reshape(-1, 1)).reshape(image_i.shape)).to(image_i.device, image_i.dtype)
-        else:
-          image_is = scaler.fit_transform(image_i.cpu().reshape(-1, 1)).reshape(image_i.shape)
-
-        subject_images['images'][:, :, :, i] = image_is
+        
+        subject_images['images'][:, :, :, i] = scaler.fit_transform(image_i.reshape(-1, 1)).reshape(image_i.shape)
         subject_images['scaler'].append(scaler)
 
     fixed_image = subject_images['images'][:, :, :, fixed_image_idx]
