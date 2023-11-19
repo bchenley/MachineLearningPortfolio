@@ -1,4 +1,4 @@
-SimpleITK as sitk
+import SimpleITK as sitk
 import numpy as np
 
 def register_image(fixed_image, moving_image,
