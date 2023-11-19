@@ -1,4 +1,4 @@
-print("Initializing TorchTimeSeries package...")
+print("Initializing BiomedicalImaging package...")
 
 import importlib
 
