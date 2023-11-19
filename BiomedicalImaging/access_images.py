@@ -1,3 +1,8 @@
+import numpy 
+
+from BiomedicalImaging.get_images import get_images
+from BiomedicalImaging.register_image import register_image
+
 def access_images(task_path,
                   image_dir='imagesTr/',
                   label_dir='labelsTr/',
@@ -100,11 +105,11 @@ def access_images(task_path,
                                                                      min_convergence=min_convergence,
                                                                      convergence_window=convergence_window,
                                                                      sitk_dtype=sitk_dtype)
-        
+
         # If a label path is specified, load the labels for the current subject
         if label_path is not None:
             labels = get_images(os.path.join(label_path, image_file))
             data[-1]['labels'] = labels
-
+    
     # Return the list of subjects with their corresponding images and labels
     return data
