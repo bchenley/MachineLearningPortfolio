@@ -1,4 +1,5 @@
 import numpy 
+import SimpleITK as sitk
 
 from BiomedicalImaging.get_images import get_images
 from BiomedicalImaging.register_image import register_image
