@@ -1,6 +1,5 @@
 SimpleITK as sitk
 import numpy as np
-import torch as torch
 
 def register_image(fixed_image, moving_image,
                    transform_type = 'similarity',
@@ -30,9 +29,7 @@ def register_image(fixed_image, moving_image,
     moving_image = sitk.ReadImage(moving_image, sitk_dtype)
   elif isinstance(moving_image, np.ndarray):
     moving_image = sitk.GetImageFromArray(moving_image)
-  elif isinstance(moving_image, torch.Tensor):
-    moving_image = sitk.GetImageFromArray(moving_image.cpu())
-
+  
   assert fixed_image.GetSize() == moving_image.GetSize(), "Image sizes do not match"
   assert fixed_image.GetSpacing() == moving_image.GetSpacing(), "Image spacings do not match"
   assert fixed_image.GetDimension() == moving_image.GetDimension(), "Image dimensions do not match"
