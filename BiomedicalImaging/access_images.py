@@ -2,8 +2,10 @@ import os
 import numpy 
 import SimpleITK as sitk
 
-from BiomedicalImaging.get_images import get_images
-from BiomedicalImaging.register_image import register_image
+import get_images, register_image
+
+# from BiomedicalImaging.get_images import get_images
+# from BiomedicalImaging.register_image import register_image
 
 def access_images(task_path,
                   image_dir='imagesTr/',
