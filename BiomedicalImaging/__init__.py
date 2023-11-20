@@ -2,11 +2,11 @@ print("Initializing BiomedicalImaging package...")
 
 import importlib
 
-__all__ = ['create_train_test',
-           'access_images',
+__all__ = ['access_images',
            'get_images',
            'register_image',
-           'register_subject_images']
+           'register_subject_images',
+           'create_train_test_images']
 
 for module_name in __all__:
     module = importlib.import_module(f'.{module_name}', __name__)
