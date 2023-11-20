@@ -4,9 +4,9 @@ import importlib
 
 __all__ = ['access_images',
            'get_images',
-           'create_train_test', 
            'register_image',
-           'register_subject_images']
+           'register_subject_images',
+           'create_train_test']
 
 for module_name in __all__:
     module = importlib.import_module(f'.{module_name}', __name__)
