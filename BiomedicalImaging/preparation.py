@@ -57,17 +57,17 @@ if __name__ == '__main__':
     random.shuffle(images)
     
     train_images = images[:train_size]
-    test_images = images[test_size:]
+    test_images = images[train_size:]
     
     ## Save training and test images
     
-    train_path = f"{save_dir}/train.pkl"
+    train_path = os.path.join(save_dir, "train.pkl")
     with open(train_path, "wb") as file:
       pickle.dump(train_images, file)
     
     print("Training images successfully saved.")
     
-    test_path = f"{save_dir}/test.pkl"
+    test_path = os.path.join(save_dir, "test.pkl")
     with open(test_path, "wb") as file:
       pickle.dump(test_images, file)
     
