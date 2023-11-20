@@ -1,9 +1,6 @@
 ## Import modules
 import os, random, pickle
 
-## import access_images 
-from BiomedicalImaging.access_images import access_images
-
 # Get user input for a given prompt
 def get_user_input(prompt):
     return input(prompt)
@@ -17,6 +14,9 @@ def validate_input(input_text, prompt):
             return user_input
 
 if __name__ == '__main__':
+
+    ## import access_images 
+    from BiomedicalImaging.access_images import access_images
 
     # Initialize variables
     task_path = ""
