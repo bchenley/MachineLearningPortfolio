@@ -4,6 +4,7 @@ import importlib
 
 __all__ = ['access_images',
            'get_images',
+           'preparation',
            'register_image',
            'register_subject_images']
 
