@@ -16,9 +16,8 @@ def validate_input(input_text, prompt):
         if confirm == 'y':
             return user_input
 
-if __name__ == '__main__':
-
-    # Initialize variables
+def main():
+  # Initialize variables
     task_path = ""
     save_dir = ""
     sample_size = 100
@@ -71,4 +70,7 @@ if __name__ == '__main__':
     with open(test_path, "wb") as file:
       pickle.dump(test_images, file)
     
-    print("Test images successfully saved.")  
+    print("Test images successfully saved.")
+
+if __name__ == '__main__':
+  main()
