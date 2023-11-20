@@ -75,13 +75,8 @@ def access_images(task_path,
 
                     # Retrieve the j-th image from the current subject
                     image_j = data[-1]['images'][:, :, :, j]
-                    if isinstance(image_j, torch.Tensor):
-                        # Normalize the tensor image and retain its type and device
-                        image_js = torch.tensor(scaler.fit_transform(image_j.cpu().reshape(-1, 1))
-                                                .reshape(image_j.shape)).to(image_j.device, image_j.dtype)
-                    else:
-                        # Normalize the numpy array image
-                        image_js = scaler.fit_transform(image_j.reshape(-1, 1)).reshape(image_j.shape)
+                    # Normalize the numpy array image
+                    image_js = scaler.fit_transform(image_j.reshape(-1, 1)).reshape(image_j.shape)
 
                     # Update the j-th image with the normalized image
                     data[-1]['images'][:, :, :, j] = image_js
