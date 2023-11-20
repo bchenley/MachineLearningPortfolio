@@ -44,30 +44,31 @@ print(f"Training size = {train_size}")
 print(f"Test size = {test_size}")
 print(f"T1 Image Registration {'enabled.' if register_images else 'disabled.'}")
 
-## Get images, performing registration if desired
-
-images = access_images(task_path = task_path,
-                       sample_size = sample_size,
-                       register_images = register_images)
-
-
-## Split images to train and test sets
-
-random.shuffle(images)
-
-train_images = images[:train_size]
-test_images = images[test_size:]
-
-## Save training and test images
-
-train_path = f"{save_dir}/train.pkl"
-with open(train_path, "wb") as file:
-  pickle.dump(train_images, file)
-
-print("Training images successfully saved.")
-
-test_path = f"{save_dir}/test.pkl"
-with open(test_path, "wb") as file:
-  pickle.dump(test_images, file)
-
-print("Test images successfully saved.")  
+if __name__ == '__main__':
+    
+    ## Get images, performing registration if desired
+    images = access_images(task_path = task_path,
+                           sample_size = sample_size,
+                           register_images = register_images)
+    
+    
+    ## Split images to train and test sets
+    
+    random.shuffle(images)
+    
+    train_images = images[:train_size]
+    test_images = images[test_size:]
+    
+    ## Save training and test images
+    
+    train_path = f"{save_dir}/train.pkl"
+    with open(train_path, "wb") as file:
+      pickle.dump(train_images, file)
+    
+    print("Training images successfully saved.")
+    
+    test_path = f"{save_dir}/test.pkl"
+    with open(test_path, "wb") as file:
+      pickle.dump(test_images, file)
+    
+    print("Test images successfully saved.")  
