@@ -1,0 +1,4 @@
+nibabel==5.1.0
+numpy==1.26.2
+packaging==23.2
+SimpleITK==2.3.1
