@@ -49,5 +49,5 @@ Before you begin, make sure you have the following prerequisites installed:
    - Training size as a percentage (e.g., 0.7 for 70% training, 30% testing)
    - Image registration (y/n): Register images to T1 (if desired)       
 
-2. This script will create train and tests set and save them the specified location ask pickle files. Please confirm they are located in the desired location. 
+2. This script will create train and tests sets and save them the specified location ask pickle files. Please confirm they are located in the desired location. 
                   
