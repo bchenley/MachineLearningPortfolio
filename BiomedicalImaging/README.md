@@ -36,6 +36,8 @@ Before you begin, make sure you have the following prerequisites installed:
 
 ## Generating Train-Test Sets
 
+If you want to create your own training and test set, please process with this section. If you'd like to use the MRI scans from 100 subjects that have already been registered, please skip this section.
+
 1. With the environment set up and activated, make sure you are in the source code directory and run the "create_train_test_images.py" script to generate the train-test sets:
 
    ```bash
@@ -52,4 +54,7 @@ Before you begin, make sure you have the following prerequisites installed:
 Be mindful of the sample size and how much available RAM you have. 100 subjects is about 30 GB.
 
 2. This script will create train and tests sets and save them the specified location ask pickle files. Please confirm they are located in the desired location. 
-                  
+
+## Exploratory Data Analysis
+
+
