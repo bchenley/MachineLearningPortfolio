@@ -1,6 +1,6 @@
 ## Overview
 
-The BiomedicalImaging project performs semantic segmentation on MRI data from brain cancer patients. The data is obtained from the Medical Segmentation Decathlon [http://medicaldecathlon.com/]. Specifically, we obtain the T1, T1c, T2, and FLAIR from a subset of patients in the "Task01_BrainTumor.tar" file.
+The BiomedicalImaging project performs semantic segmentation on MRI data from brain cancer patients. The data is obtained from the [Medical Segmentation Decathlon](http://medicaldecathlon.com/). Specifically, we obtain the T1, T1c, T2, and FLAIR from a subset of patients in the "Task01_BrainTumor.tar" file.
 We employ Pytorch to develop various models for the segmentation task and evaluate the results. 
 
 ## Prerequisites
