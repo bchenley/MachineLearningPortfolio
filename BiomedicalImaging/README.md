@@ -11,7 +11,7 @@ Before you begin, make sure you have the following prerequisites installed:
 - Python 3.x
 - pip (Python package manager)
 
-## Setting upyour virtual environment:
+## I. Setting upyour virtual environment:
 
 1. Clone the BiomedicalImaging repository to your local machine:
 
@@ -55,6 +55,9 @@ Be mindful of the sample size and how much available RAM you have. 100 subjects 
 
 2. This script will create train and tests sets and save them the specified location ask pickle files. Please confirm they are located in the desired location. 
 
-## Exploratory Data Analysis
+## II. Exploratory Data Analysis
+
+The purpose of exploratory data analysis (EDA) is to visualize the features and labels to gain insight into the data structure and help guide the modeling approach. This [notebook]() provides a simple script to analyze the T1, T1c, T2, and FLAIR images 
+
 
 
