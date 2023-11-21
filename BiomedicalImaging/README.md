@@ -20,21 +20,25 @@ Before you begin, make sure you have the following prerequisites installed:
 
 2. Navigate to the "BiomedicalImaging" source code directory:
 
+   ```bash
    cd MachineLearningPortfolio/BiomedicalImaging/src
 
 3. Create a virtual environment (or use an existing one)
 
+   ```bash
    python -m venv bmienv       # Create a virtual environment named "bmienv" (if you're using your own, skip this line)
    source bmienv/bin/activate  # Activate the virtual environment (or the environment of your own)
 
-4. Install the required dependencies using the provided requirements.txt file
+5. Install the required dependencies using the provided requirements.txt file
 
+   ```bash
    pip install -r requirements.text    
 
 ## Generating Train-Test Sets
 
-With the environment set up and activated, make sure you are in the source code directory and run the "create_train_test_images.py" script to generate the train-test sets:
+1. With the environment set up and activated, make sure you are in the source code directory and run the "create_train_test_images.py" script to generate the train-test sets:
 
+   ```bash
    python create_train_test_images.py    
 
 The script will prompt you for the following information: 
@@ -45,7 +49,5 @@ The script will prompt you for the following information:
    Training size as a percentage (e.g., 0.7 for 70% training, 30% testing)
    Image registration (y/n): Register images to T1 (if desired)       
 
-This script will create train and tests set and save them the specified location.
-                                                    
-
-      
+2. This script will create train and tests set and save them the specified location ask pickle files. Please confirm they are located in the desired location. 
+                  
