@@ -38,39 +38,30 @@ def generate_dataset(df_master: pd.DataFrame,
   zeros_ = np.zeros((N-1,))
   nans_ = np.ones((N-1,)) * np.nan
 
-  df_interval = pd.DataFrame({# inquires
-                              'total_inquiries': zeros_,
-                              'total_home_inquiries': zeros_,
-                              'total_shared_inquiries': zeros_,
-                              'total_private_inquiries': zeros_,
-                              'guest_rate': zeros_,
-                              'guest_return_rate': zeros_,
-                              'host_return_rate': zeros_,
-                              'interaction_rate': zeros_,
-                              'message_rate': zeros_,
-                              'total_contact_me': zeros_,
-                              'total_book_it': zeros_,
-                              'total_instant_book': zeros_,
-                              'pct_contact_me': zeros_,
-                              'pct_book_it': zeros_,
-                              'pct_instant_book': zeros_,
-                              'pct_past_booker': zeros_,
-                              'pct_new_user': zeros_,
-                              # replies
+  df_interval = pd.DataFrame({'total_inquiries': zeros_,
                               'total_replies': zeros_,
-                              'reply_rate': zeros_,
-                              'avg_reply_time': nans_,
-                              # accepted
                               'total_accepted': zeros_,
-                              'accepted_rate': zeros_,
-                              'avg_accepted_time': nans_,
-                              # booking
                               'total_booking': zeros_,
+                              'contact_me_rate': zeros_,
+                              'book_it_rate': zeros_,
+                              'instant_book_rate': zeros_,
+                              'guest_return_rate': zeros_,
+                              'guest_message_rate': zeros_,
+                              'words_in_guest_profile': zeros_,
+                              'reply_rate': zeros_,
+                              'reply_time': nans_,
+                              'accepted_rate': zeros_,
+                              'accepted_time': nans_,
+                              'reply_conversion_rate': zeros_,
+                              'accepted_conversion_rate': zeros_,
                               'booking_rate': zeros_,
-                              'avg_booking_time': nans_},
+                              'booking_time': nans_,
+                              'listing_rate': zeros_,
+                              'interaction': zeros_},
                               index = time[1:])
 
   inquiry_idx_I = []
+
 
   for i in range(1, len(time)):
     min_time_i, max_time_i = time[i-1], time[i]
@@ -82,75 +73,71 @@ def generate_dataset(df_master: pd.DataFrame,
     accepted_idx_i = np.where(~df.ts_accepted_at_first.isnull() & (df.ts_accepted_at_first > min_time_i) & (df.ts_accepted_at_first <= max_time_i))[0]
     booking_idx_i = np.where(~df.ts_booking_at.isnull() & (df.ts_booking_at > min_time_i) & (df.ts_booking_at <= max_time_i))[0]
 
+    total_contact_me_i = sum(df.contact_channel_first[inquiry_idx_i] == 'contact_me')
+    total_book_it_i = sum(df.contact_channel_first[inquiry_idx_i] == 'book_it')
+    total_instant_book_i = sum(df.contact_channel_first[inquiry_idx_i] == 'instant_book')
+
+    total_inquiries_i = len(inquiry_idx_i)
+    total_replies_i = len(reply_idx_i)
+    total_accepted_i = len(accepted_idx_i)
+    total_booking_i = len(booking_idx_i)
+
     inquiry_idx_I.append(inquiry_idx_i)
 
-    # number of inquiries
-    df_interval.total_inquiries[i-1] = len(inquiry_idx_i)
+    # total inquiries
+    df_interval.loc[df_interval.index[i-1], 'total_inquiries'] = total_inquiries_i
+    # total replies
+    df_interval.loc[df_interval.index[i-1], 'total_replies'] = total_replies_i
+    # total accepted
+    df_interval.loc[df_interval.index[i-1], 'total_accepted'] = total_accepted_i
+    # total booking
+    df_interval.loc[df_interval.index[i-1], 'total_booking'] = total_booking_i
 
-    df_interval.total_home_inquiries[i-1] = sum(df.room_type[inquiry_idx_i] == 'Entire home/apt')
-    df_interval.total_shared_inquiries[i-1] = sum(df.room_type[inquiry_idx_i] == 'Shared room')
-    df_interval.total_private_inquiries[i-1] = sum(df.room_type[inquiry_idx_i] == 'Private room')
+    # 'contact me' rate
+    df_interval.loc[df_interval.index[i-1], 'contact_me_rate'] = total_contact_me_i / total_inquiries_i
+    # 'book it' rate
+    df_interval.loc[df_interval.index[i-1], 'book_it_rate'] = total_book_it_i / total_inquiries_i
+    # 'instant book' rate
+    df_interval.loc[df_interval.index[i-1], 'instant_book_rate'] = total_instant_book_i / total_inquiries_i
 
-    # Guests per inquiry
-    df_interval.guest_rate[i-1] = df.m_guests[inquiry_idx_i].sum() / df_interval.total_inquiries[i-1]
+    # guest return rate
+    past_booker_idx_i = inquiry_idx_i[np.where(df.guest_user_stage_first[inquiry_idx_i] == 'past_booker')[0]]
+    df_interval.loc[df_interval.index[i-1], 'guest_return_rate'] = df.id_guest_anon[past_booker_idx_i].unique().size / df.id_guest_anon[inquiry_idx_i].unique().size
 
-    if len(inquiry_idx_I) > 1:
-      inquiry_idx_prev = np.concatenate(inquiry_idx_I[-(look_back+1):-1])
+    # guest message rate
+    df_interval.loc[df_interval.index[i-1], 'guest_message_rate'] = df.m_first_message_length_in_characters[inquiry_idx_i].sum() / total_inquiries_i
 
-      total_guest_repeat = len(set(df.id_guest_anon[inquiry_idx_prev]) & set(df.id_guest_anon[inquiry_idx_i]))
-      df_interval.guest_return_rate[i-1] = total_guest_repeat / len(np.unique(df.id_guest_anon[inquiry_idx_i]))
+    # guest profile length
+    df_interval.loc[df_interval.index[i-1], 'words_in_guest_profile'] = df.words_in_guest_profile[inquiry_idx_i].mean()
 
-      total_host_repeat = len(set(df.id_host_anon[inquiry_idx_prev]) & set(df.id_host_anon[inquiry_idx_i]))
-      df_interval.host_return_rate[i-1] = total_host_repeat / len(np.unique(df.id_host_anon[inquiry_idx_i]))
+    # reply rate
+    df_interval.loc[df_interval.index[i-1], 'reply_rate']  = total_replies_i / total_inquiries_i
+    # reply time
+    df_interval.loc[df_interval.index[i-1], 'reply_time'] = (df.ts_reply_at_first[inquiry_idx_i] - df.ts_interaction_first[inquiry_idx_i]).dropna().mean().seconds
+    df_interval.loc[df_interval.index[i-1], 'reply_time'] /= 3600 if interval == 'hour' else 3600*24
 
-    # Interaction rate
-    df_interval.interaction_rate[i-1] = np.sum(df.m_interactions[inquiry_idx_i]) / df_interval.total_inquiries[i-1]
+    # accepted rate
+    df_interval.loc[df_interval.index[i-1], 'accepted_rate']  = total_accepted_i / total_inquiries_i
+    # accepted time
+    df_interval.loc[df_interval.index[i-1], 'accepted_time'] = (df.ts_accepted_at_first[inquiry_idx_i] - df.ts_interaction_first[inquiry_idx_i]).dropna().mean().seconds
+    df_interval.loc[df_interval.index[i-1], 'accepted_time'] /= 3600 if interval == 'hour' else 3600*24
 
-    # Message length by inquiry
-    df_interval.message_rate[i-1] = df.m_first_message_length_in_characters[inquiry_idx_i].sum() / df_interval.total_inquiries[i-1]
+    # booking rate
+    df_interval.loc[df_interval.index[i-1], 'booking_rate']  = total_booking_i / total_inquiries_i
+    # booking time
+    df_interval.loc[df_interval.index[i-1], 'booking_time'] = (df.ts_booking_at[inquiry_idx_i] - df.ts_interaction_first[inquiry_idx_i]).dropna().mean().seconds
+    df_interval.loc[df_interval.index[i-1], 'booking_time'] /= 3600 if interval == 'hour' else 3600*24
 
-    # number of 'contact me', 'book it', and 'instant book' inquires
-    df_interval.total_contact_me[i-1] = sum(df.contact_channel_first[inquiry_idx_i] == 'contact_me')
-    df_interval.total_book_it[i-1] = sum(df.contact_channel_first[inquiry_idx_i] == 'book_it')
-    df_interval.total_instant_book[i-1] = sum(df.contact_channel_first[inquiry_idx_i] == 'instant_book')
+    # reply conversion rate
+    df_interval.loc[df_interval.index[i-1], 'reply_conversion_rate'] = total_booking_i / total_replies_i
 
-    # Percent of inquiries in each channel
-    df_interval.pct_contact_me[i-1] = df_interval.total_contact_me[i-1] / df_interval.total_inquiries[i-1]
-    df_interval.pct_book_it[i-1] = df_interval.total_book_it[i-1] / df_interval.total_inquiries[i-1]
-    df_interval.pct_instant_book[i-1] = df_interval.total_instant_book[i-1] / df_interval.total_inquiries[i-1]
+    # accepted conversion rate
+    df_interval.loc[df_interval.index[i-1], 'accepted_conversion_rate'] = total_booking_i / total_accepted_i
 
-    # Percent of inquiries made by past booker or new user
-    df_interval.pct_past_booker[i-1] = sum(df.guest_user_stage_first[inquiry_idx_i] == 'past_booker') / df_interval.total_inquiries[i-1]
-    df_interval.pct_new_user[i-1] = sum(df.guest_user_stage_first[inquiry_idx_i] == 'new') / df_interval.total_inquiries[i-1]
+    # listing rate
+    df_interval.loc[df_interval.index[i-1], 'listing_rate'] = len(df.id_listing_anon[inquiry_idx_i].unique())/len(df.id_guest_anon[inquiry_idx_i].unique())
 
-    # number replied
-    df_interval.total_replies[i-1] = len(reply_idx_i)
-
-    # host reply rate
-    df_interval.reply_rate[i-1] = df_interval.total_replies[i-1] / df_interval.total_inquiries[i-1]
-
-    # average reply time
-    df_interval.avg_reply_time[i-1] = np.nanmean((df.ts_reply_at_first[reply_idx_i] - df.ts_interaction_first[reply_idx_i]).dt.seconds)
-    df_interval.avg_reply_time[i-1] /= (3600*24) if interval == 'day' else 3600
-
-    # number accepted
-    df_interval.total_accepted[i-1] = len(accepted_idx_i)
-
-    # host accepted rate
-    df_interval.accepted_rate[i-1] = df_interval.total_accepted[i-1] / df_interval.total_inquiries[i-1]
-
-    # average accepted time
-    df_interval.avg_accepted_time[i-1] = np.nanmean((df.ts_accepted_at_first[accepted_idx_i] - df.ts_interaction_first[accepted_idx_i]).dt.seconds)
-    df_interval.avg_accepted_time[i-1] /= (3600*24) if interval == 'day' else 3600
-
-    # number booked
-    df_interval.total_booking[i-1] = len(booking_idx_i)
-
-    # host booking rate
-    df_interval.booking_rate[i-1] = df_interval.total_booking[i-1] / df_interval.total_inquiries[i-1]
-
-    # average booking time
-    df_interval.avg_booking_time[i-1] = np.nanmean((df.ts_booking_at[booking_idx_i] - df.ts_interaction_first[booking_idx_i]).dt.seconds)
-    df_interval.avg_booking_time[i-1] /= (3600*24) if interval == 'day' else 3600
+    # interaction
+    df_interval.loc[df_interval.index[i-1], 'interaction'] = df.m_interactions[inquiry_idx_i].sum()/len(set(df.id_guest_anon[inquiry_idx_i]) | set(df.id_host_anon[inquiry_idx_i]))
 
   return df_interval
