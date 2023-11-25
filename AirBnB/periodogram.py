@@ -1,3 +1,5 @@
+import scipy as sc
+
 def periodogram(X, fs=1, window='hann', nfft=None,
                 detrend=None, return_onesided=True,
                 scaling='density', axis=0):
