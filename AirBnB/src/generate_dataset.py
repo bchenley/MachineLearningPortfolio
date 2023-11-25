@@ -32,13 +32,19 @@ def generate_dataset(df_master: pd.DataFrame,
   min_time = max(min(df.ts_interaction_first), min(df.ts_reply_at_first), min(df.ts_accepted_at_first), min(df.ts_booking_at))
 
   time = pd.date_range(start = min_time, end = max_time, freq = '1D' if interval == 'day' else '1H')
+  
+  if interval == 'day':
+    time = time.strftime('%Y-%m-%d')
+  else:
+    time = time.strftime('%Y-%m-%d %H:00')
 
   N = len(time)
 
   zeros_ = np.zeros((N-1,))
   nans_ = np.ones((N-1,)) * np.nan
 
-  df_interval = pd.DataFrame({'total_inquiries': zeros_,
+  df_interval = pd.DataFrame({'time': time,
+                              'total_inquiries': zeros_,
                               'total_replies': zeros_,
                               'total_accepted': zeros_,
                               'total_booking': zeros_,
@@ -127,7 +133,7 @@ def generate_dataset(df_master: pd.DataFrame,
     # booking time
     df_interval.loc[df_interval.index[i-1], 'booking_time'] = (df.ts_booking_at[inquiry_idx_i] - df.ts_interaction_first[inquiry_idx_i]).dropna().mean().seconds
     df_interval.loc[df_interval.index[i-1], 'booking_time'] /= 3600 if interval == 'hour' else 3600*24
-
+    
     # reply conversion rate
     df_interval.loc[df_interval.index[i-1], 'reply_conversion_rate'] = total_booking_i / total_replies_i
 
