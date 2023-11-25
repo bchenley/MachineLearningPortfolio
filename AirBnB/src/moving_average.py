@@ -24,7 +24,7 @@ def moving_average(X, window):
     for i in range(X.shape[0]):
         is_odd = int(np.mod(len_window, 2) == 1)
 
-        m = np.arange((i - (len_window - is_odd) / 2), (i + (len_window - is_odd) / 2 - (is_odd == 0) + 1))
+        m = np.arange((i - (len_window - is_odd) / 2), (i + (len_window - is_odd) / 2 - (is_odd == 0) + 1), dtype = np.int8)
 
         k = m[(m >= 0) & (m < X.shape[0])]
 
