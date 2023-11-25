@@ -43,8 +43,7 @@ def generate_dataset(df_master: pd.DataFrame,
   zeros_ = np.zeros((N-1,))
   nans_ = np.ones((N-1,)) * np.nan
 
-  df_interval = pd.DataFrame({'time': time,
-                              'total_inquiries': zeros_,
+  df_interval = pd.DataFrame({'total_inquiries': zeros_,
                               'total_replies': zeros_,
                               'total_accepted': zeros_,
                               'total_booking': zeros_,
