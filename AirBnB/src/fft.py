@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-import numpy as np
-import pandas as pd
-
 def fft(x, fs=1, axes=0, nfft=None, norm='backward'):
     """
     Computes the Fast Fourier Transform (FFT) of the input signal.
