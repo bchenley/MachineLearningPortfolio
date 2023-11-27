@@ -1,55 +1,53 @@
 import pandas as pd
 import numpy as np
 
-def fft(x, fs = 1, axes = 0, nfft = None, norm = 'backward'):
-  
-  '''
-  Computes the Fast Fourier Transform (FFT) of the input signal.
+import numpy as np
+import pandas as pd
 
-  Args:
-      x: The input signal. If not a torch.Tensor, it will be converted to one.
-      fs: The sampling frequency of the input signal.
-      axes: The dimension(s) along which to compute the FFT.
-      nfft: The number of FFT points. If None, it is set to the size of the input signal along the specified dimension.
-      norm: The normalization mode. Options are 'backward' (default) and 'forward'.
-      device: The device to perform the computation on. If None, the default device is used.
-      dtype: The data type of the output.
+def fft(x, fs=1, axes=0, nfft=None, norm='backward'):
+    """
+    Computes the Fast Fourier Transform (FFT) of the input signal.
+    
+    Args:
+        x (np.ndarray or pd.DataFrame): The input signal.
+        fs (float): The sampling frequency of the input signal.
+        axes (int or tuple of ints): The dimension(s) along which to compute the FFT.
+        nfft (int): The number of FFT points. Defaults to the size of the input signal along the specified axis.
+        norm (str): The normalization mode, 'backward' (default) or 'forward'.
+    
+    Returns:
+        freq (np.ndarray): The frequency values corresponding to the FFT.
+        x_fft_mag (np.ndarray): The magnitude of the FFT coefficients.
+        x_fft_phase (np.ndarray): The phase of the FFT coefficients.
+    """
+    # Convert pandas DataFrame to numpy array if necessary
+    if isinstance(x, pd.DataFrame):
+        x = x.to_numpy()
 
-  Returns:
-      freq: The frequency values corresponding to the FFT.
-      x_fft_mag: The magnitude of the FFT coefficients.
-      x_fft_phase: The phase of the FFT coefficients.
-  '''
-  if isinstance(x, pd.core.frame.DataFrame):
-      x = x.values
-      
-  if nfft is None:
-      nfft = x.shape[axes]
-      
-  s, axes = [nfft, axes if isinstance(axes, int) else (-2, -1)]
+    # Determine the shape of the output FFT
+    s = x.shape[axes] if nfft is None else nfft
+    
+    # Compute the FFT along the specified axis
+    
+    x_fft = np.fft.fft(x, n=s, axis=axes, norm=norm)
+    
+    # Calculate the frequencies corresponding to the FFT
+    freq = np.fft.fftfreq(n=s, d=1/fs)
+    
+    # Only take the positive frequencies and corresponding FFT values
+    if s % 2 == 0:
+        freq = freq[:s//2]
+        x_fft = x_fft[:s//2, :]
+    else:
+        freq = freq[:(s//2 + 1)]
+        x_fft = x_fft[:(s//2 + 1), :]
 
-  s += np.mod(s, 2)
-  x_fft = np.fft.fftn(x, s = s, axes = axes, norm = norm)
+    # Calculate magnitude and phase
+    x_fft_mag = np.abs(x_fft)
+    x_fft_phase = np.angle(x_fft)
+    
+    # Adjust the magnitude for normalization ('backward' FFT normalization includes a factor of 1/n)
+    if norm == 'backward':
+        x_fft_mag *= (2/s)
 
-  N = int(s // 2)
-
-  if isinstance(axes, int):
-      freq = np.fft.fftfreq(s, d = 1 / fs)
-
-      x_fft = x_fft.split(N, axes = axes)[0]
-
-      x_fft_mag = 2.0 / s * np.abs(x_fft)
-
-      x_fft_phase = np.angle(x_fft)
-
-  elif axes == (-2, -1):
-      freq = np.meshgrid(freq, freq, indexing='ij')
-
-      x_fft_mag = 2 / s * np.abs(x_fft[..., :N, :N])
-
-      x_fft_phase = np.angle(x_fft)[..., :N, :N]
-
-  else:
-      raise ValueError(f'axes ({axes}) must be 1 or (-2, -1)... for now.')
-
-  return freq, x_fft_mag, x_fft_phase
+    return freq, x_fft_mag, x_fft_phase
