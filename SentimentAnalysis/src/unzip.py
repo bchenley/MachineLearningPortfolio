@@ -1,3 +1,5 @@
+import os, zipfile
+
 def unzip(source, sink = None):
   
   sink = sink or os.path.dirname(source)
