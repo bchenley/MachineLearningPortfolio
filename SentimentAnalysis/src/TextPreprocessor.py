@@ -1,6 +1,6 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from src import preprocess_text
+from src.preprocess_text import preprocess_text
 
 class TextPreprocessor(BaseEstimator, TransformerMixin):
   def __init__(self, 
