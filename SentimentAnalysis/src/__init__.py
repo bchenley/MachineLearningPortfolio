@@ -2,7 +2,9 @@ print("Initializing SentimentAnalysis package...")
 
 import importlib
 
-__all__ = ['unzip']
+__all__ = ['unzip',
+          'TextPreprocessor',
+          'preprocess_text']
 
 for module_name in __all__:
     module = importlib.import_module(f'.{module_name}', __name__)
