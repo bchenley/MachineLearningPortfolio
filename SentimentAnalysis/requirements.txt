@@ -1,0 +1,6 @@
+Lumpy
+Pandas
+Scikit-learn
+torch
+pytorch_lightning
+contractions
