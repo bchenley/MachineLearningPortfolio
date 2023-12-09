@@ -1,10 +1,13 @@
+# 
 ## Inquiry Rate
 def calculate_inquiry_rate(df, variable = None, value = None, interval = 'D'):
 
     df = df.copy()
+        
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
     
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df.index.name = 'inquiry_date'
 
     df_resampled_total = df.resample(interval).agg({'id_guest_anon': 'nunique'})
 
@@ -16,20 +19,27 @@ def calculate_inquiry_rate(df, variable = None, value = None, interval = 'D'):
 
     df_resampled = df.resample(interval).agg({'id_guest_anon': 'nunique'})
 
-    value_inquiry_rate = df_resampled['id_guest_anon'] / df_resampled_total['id_guest_anon']
+    inquiry_rate = df_resampled['id_guest_anon'] / df_resampled_total['id_guest_anon']
 
-    value_inquiry_rate = value_inquiry_rate.fillna(0)
+    inquiry_rate = inquiry_rate.fillna(0)
+    
+    if variable is not None and value is not None:
+        inquiry_rate.name = f"inquiry_rate_{variable}_{value}"
+    else:
+        inquiry_rate.name = 'inquiry_rate'
 
-    return value_inquiry_rate
+    return inquiry_rate
 
-## Listing Rate
+# Listing Rate
 def calculate_listing_rate(df, variable = None, value = None, interval = 'D'):
     
     df = df.copy()
     
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
 
+    # df.index.name = 'inquiry_date'
+    
     df_resampled_total = df.resample(interval).agg({'id_listing_anon': 'nunique'})
 
     if variable is not None and value is not None:
@@ -39,20 +49,27 @@ def calculate_listing_rate(df, variable = None, value = None, interval = 'D'):
             raise ValueError(f"Column '{variable}' not found in DataFrame")
 
     df_resampled = df.resample(interval).agg({'id_listing_anon': 'nunique'})
+    
+    listing_rate = (df_resampled['id_listing_anon'] / df_resampled_total['id_listing_anon'])
 
-    value_listing_rate = (df_resampled['id_listing_anon'] / df_resampled_total['id_listing_anon'])
+    listing_rate = listing_rate.fillna(0)
 
-    value_listing_rate = value_listing_rate.fillna(0)
+    if variable is not None and value is not None:
+        listing_rate.name = f"listing_rate_{variable}_{value}"
+    else:
+        listing_rate.name = 'listing_rate'
 
-    return value_listing_rate
+    return listing_rate
 
-# User Profile Completeness
+# Average User Profile
 def calculate_avg_user_profile_completeness(df, user='guest', interval='D', variable=None, value=None):
     
     df = df.copy()
 
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
+
+    # df.index.name = 'inquiry_date'
 
     profile_length_column = f"words_in_{user}_profile"
 
@@ -69,6 +86,13 @@ def calculate_avg_user_profile_completeness(df, user='guest', interval='D', vari
 
     avg_user_profile_length = avg_user_profile_length.fillna(0)
 
+    avg_user_profile_length = avg_user_profile_length[profile_length_column]
+
+    if variable is not None and value is not None:
+        avg_user_profile_length.name = f"avg_{user}_profile_completeness_{variable}_{value}"
+    else:
+        avg_user_profile_length.name = f"avg_{user}_profile_completeness"
+
     return avg_user_profile_length
 
 # Host Response Rate
@@ -76,9 +100,11 @@ def calculate_host_response_rate(df, interval='D', variable=None, value=None):
     
     df = df.copy()
 
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
 
+    # df.index.name = 'inquiry_date'
+    
     if variable is not None and value is not None:
         if variable in df.columns:
             df = df[df[variable] == value]
@@ -94,10 +120,15 @@ def calculate_host_response_rate(df, interval='D', variable=None, value=None):
             raise ValueError(f"Column '{col}' not found in DataFrame")
 
     df_resampled = df.resample(interval).agg({'inquired': 'sum', 'inquiry_responded': 'sum'})
-
+    
     host_response_rate = df_resampled['inquiry_responded'] / df_resampled['inquired']
-
+    
     host_response_rate = host_response_rate.fillna(0)
+
+    if variable is not None and value is not None:
+        host_response_rate.name = f"host_response_rate_{variable}_{value}"
+    else:
+        host_response_rate.name = 'host_response_rate'
 
     return host_response_rate
 
@@ -106,8 +137,8 @@ def calculate_host_approval_rate(df, interval='D', variable=None, value=None):
     
     df = df.copy()
 
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
 
     if variable is not None and value is not None:
         if variable in df.columns:
@@ -131,6 +162,11 @@ def calculate_host_approval_rate(df, interval='D', variable=None, value=None):
 
     host_approval_rate = host_approval_rate.fillna(0)
 
+    if variable is not None and value is not None:
+        host_approval_rate.name = f"host_approval_rate_{variable}_{value}"
+    else:
+        host_approval_rate.name = 'host_approval_rate'
+
     return host_approval_rate
 
 # Booking Conversion Rate
@@ -138,9 +174,11 @@ def calculate_booking_conversion_rate(df, interval='D', variable=None, value=Non
     
     df = df.copy()
 
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
 
+    # df.index.name = 'inquiry_date'
+    
     if variable is not None and value is not None:
         if variable in df.columns:
             df = df[df[variable] == value]
@@ -161,17 +199,24 @@ def calculate_booking_conversion_rate(df, interval='D', variable=None, value=Non
 
     booking_conversion_rate = booking_conversion_rate.fillna(0)
 
+    if variable is not None and value is not None:
+        booking_conversion_rate.name = f"booking_conversion_rate_{variable}_{value}"
+    else:
+        booking_conversion_rate.name = 'booking_conversion_rate'
+
     return booking_conversion_rate
 
-# Avg Response Time
+# Average Response Time
 def calculate_avg_response_time(df, interval='D', variable=None, value=None):
     df = df.copy()
 
     # Convert the time columns to datetime
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
     df['ts_reply_at_first'] = pd.to_datetime(df['ts_reply_at_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df.set_index('ts_interaction_first', inplace=True)
 
+    # df.index.name = 'inquiry_date'
+    
     # Apply filtering if a variable and value are provided
     if variable is not None and value is not None:
         if variable in df.columns:
@@ -188,16 +233,23 @@ def calculate_avg_response_time(df, interval='D', variable=None, value=None):
     # Handle potential NaN values
     avg_response_time = avg_response_time.fillna(0)
 
+    avg_response_time = avg_response_time['response_time']
+    
+    if variable is not None and value is not None:
+        avg_response_time.name = f"avg_response_time_{variable}_{value}"
+    else:
+        avg_response_time.name = 'avg_response_time'
+
     return avg_response_time
 
-# Avg Approval Time
+# Average Approval Time
 def calculate_avg_approval_time(df, interval='D', variable=None, value=None):
     df = df.copy()
 
     # Convert the time columns to datetime
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
     df['ts_accepted_at_first'] = pd.to_datetime(df['ts_accepted_at_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df.set_index('ts_interaction_first', inplace=True)
 
     # Apply filtering if a variable and value are provided
     if variable is not None and value is not None:
@@ -215,17 +267,26 @@ def calculate_avg_approval_time(df, interval='D', variable=None, value=None):
     # Handle potential NaN values
     avg_approval_time = avg_approval_time.fillna(0)
 
+    avg_approval_time = avg_approval_time['approval_time']
+
+    if variable is not None and value is not None:
+        avg_approval_time.name = f"avg_approval_time_{variable}_{value}"
+    else:
+        avg_approval_time.name = 'avg_approval_time'
+
     return avg_approval_time
 
-# Avg Booking Time
+# Average Booking Time
 def calculate_avg_booking_time(df, interval='D', variable=None, value=None):
     df = df.copy()
 
     # Convert the time columns to datetime
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
     df['ts_booking_at'] = pd.to_datetime(df['ts_booking_at'])
-    df.set_index('ts_interaction_first', inplace=True)
+    # df.set_index('ts_interaction_first', inplace=True)
 
+    # df.index.name = 'inquiry_date'
+    
     # Apply filtering if a variable and value are provided
     if variable is not None and value is not None:
         if variable in df.columns:
@@ -242,17 +303,26 @@ def calculate_avg_booking_time(df, interval='D', variable=None, value=None):
     # Handle potential NaN values
     avg_booking_time = avg_booking_time.fillna(0)
 
+    avg_booking_time = avg_booking_time['booking_time']
+
+    if variable is not None and value is not None:
+        avg_booking_time.name = f"avg_booking_time_{variable}_{value}"
+    else:
+        avg_booking_time.name = 'avg_booking_time'
+
     return avg_booking_time
 
-# Avg Stay Time
+# Average Stay Time
 def calculate_avg_stay_time(df, interval='D', variable=None, value=None):
     
     df = df.copy()
 
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    
     df['ds_checkin_first'] = pd.to_datetime(df['ds_checkin_first'])
     df['ds_checkout_first'] = pd.to_datetime(df['ds_checkout_first'])
-    df.set_index('ts_interaction_first', inplace=True)
+
+    # df.set_index('ts_interaction_first', inplace=True)
 
     if variable is not None and value is not None:
         if variable in df.columns:
@@ -266,16 +336,25 @@ def calculate_avg_stay_time(df, interval='D', variable=None, value=None):
 
     avg_stay_time = avg_stay_time.fillna(0)
 
+    avg_stay_time = avg_stay_time['stay_time']
+
+    if variable is not None and value is not None:
+        avg_stay_time.name = f"avg_stay_time_{variable}_{value}"
+    else:
+        avg_stay_time.name = 'avg_stay_time'
+
     return avg_stay_time
 
-# Avg Engagement
+# Average Engagement
 def calculate_avg_engagement(df, interval='D', variable=None, value=None):
     
     df = df.copy()
-
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
-    df.set_index('ts_interaction_first', inplace=True)
-        
+    
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
+    # df.set_index('ts_interaction_first', inplace=True)
+    
+    # df.index.name = 'inquiry_date'
+    
     if variable is not None and value is not None:
         if variable in df.columns:
             df = df[df[variable] == value]
@@ -286,27 +365,14 @@ def calculate_avg_engagement(df, interval='D', variable=None, value=None):
 
     avg_engagement = avg_engagement.fillna(0)
 
-    return avg_engagement
+    avg_engagement = avg_engagement['m_interactions']
 
-# Avg Reviews
-def calculate_avg_reviews(df, interval='D', variable=None, value=None):
-    
-    df = df.copy()
-
-    df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])    
-    df.set_index('ts_interaction_first', inplace=True)
-        
     if variable is not None and value is not None:
-        if variable in df.columns:
-            df = df[df[variable] == value]
-        else:
-            raise ValueError(f"Column '{variable}' not found in DataFrame")
+        avg_engagement.name = f"avg_engagement_{variable}_{value}"
+    else:
+        avg_engagement.name = 'avg_engagement'
 
-    avg_reviews = df.resample(interval).agg({'total_reviews': 'mean'})
-
-    avg_reviews = avg_reviews.fillna(0)
-
-    return avg_reviews
+    return avg_engagement
 
 # IQR Outliers
 def iqr_outlier(df_col, ordered=False):
