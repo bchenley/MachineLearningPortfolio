@@ -1,5 +1,20 @@
 import pandas as pd
 
+from src.metrics import (
+    calculate_inquiry_rate,
+    calculate_listing_rate,
+    calculate_avg_user_profile_completeness,
+    calculate_host_response_rate,
+    calculate_host_approval_rate,
+    calculate_booking_conversion_rate,
+    calculate_avg_response_time,
+    calculate_avg_approval_time,
+    calculate_avg_booking_time,
+    calculate_avg_stay_time,
+    calculate_avg_engagement,
+    calculate_avg_reviews
+    )
+
 def generate_timeseries(df, interval='D', segments = None, values = None):
 
     df = df.copy()
