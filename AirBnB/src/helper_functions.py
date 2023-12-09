@@ -1,4 +1,4 @@
-# 
+
 ## Inquiry Rate
 def calculate_inquiry_rate(df, variable = None, value = None, interval = 'D'):
 
