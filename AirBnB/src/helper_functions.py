@@ -6,12 +6,15 @@ def calculate_inquiry_rate(df, variable = None, value = None, interval = 'D'):
     df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
     df.set_index('ts_interaction_first', inplace=True)
 
-    df_resampled_total = df.resample(interval).agg({'id_guest_anon': 'nunique'})
+    if variable is not None and value is not None:
+        if variable in df.columns:
+            df = df[df[variable] == value]
+        else:
+            raise ValueError(f"Column '{variable}' not found in DataFrame")
+    
+    df_resampled = df.resample(interval).agg({'id_guest_anon': 'nunique'})
 
-    df_value = df[df[variable] == value]
-    df_value_resampled = df_value.resample(interval).agg({'id_guest_anon': 'nunique'})
-
-    value_inquiry_rate = (df_value_resampled['id_guest_anon'] / df_resampled_total['id_guest_anon'])
+    value_inquiry_rate = df_resampled['id_guest_anon'] / df_resampled['id_guest_anon']
 
     value_inquiry_rate = value_inquiry_rate.fillna(0)
 
@@ -25,10 +28,13 @@ def calculate_listing_rate(df, variable = None, value = None, interval = 'D'):
     df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])
     df.set_index('ts_interaction_first', inplace=True)
 
-    df_resampled_total = df.resample(interval).agg({'id_listing_anon': 'nunique'})
+    if variable is not None and value is not None:
+        if variable in df.columns:
+            df = df[df[variable] == value]
+        else:
+            raise ValueError(f"Column '{variable}' not found in DataFrame")
 
-    df_value = df[df[variable] == value] if (variable is not None) & (value is not None) else df
-    df_value_resampled = df_value.resample(interval).agg({'id_listing_anon': 'nunique'})
+    df_resampled_total = df.resample(interval).agg({'id_listing_anon': 'nunique'})
 
     value_listing_rate = (df_value_resampled['id_listing_anon'] / df_resampled_total['id_listing_anon'])
 
