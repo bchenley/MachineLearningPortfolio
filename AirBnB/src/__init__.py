@@ -5,7 +5,8 @@ import importlib
 __all__ = ['generate_dataset', # 'create_time_series',                      
            'fft',
            'moving_average',           
-           'periodogram']
+           'periodogram',
+           'metrics']
 
 for module_name in __all__:
     module = importlib.import_module(f'.{module_name}', __name__)
