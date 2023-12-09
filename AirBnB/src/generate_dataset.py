@@ -1,6 +1,6 @@
 import pandas as pd
 
-def generate_dataset(df, interval='D', segments = None, values = None):
+def generate_timeseries(df, interval='D', segments = None, values = None):
 
     df = df.copy()
 
