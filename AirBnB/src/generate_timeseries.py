@@ -76,5 +76,14 @@ def generate_timeseries(df, interval='D', segments = None, values = None):
     # # Rename the index to 'inquiry_date'
     # master_df.index.name = 'inquiry_date'
     # master_df.reset_index(inplace=True)
+
+    master_df['day'] = master_df.index.day_name()
+    master_df['month'] = master_df.index.month_name()
+
+    day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    master_df['day'] = pd.Categorical(master_df['day'], categories = day_order, ordered = True)
+
+    month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October' , 'November', 'December']
+    master_df['month'] = pd.Categorical(master_df['month'], categories = month_order, ordered = True)
     
     return master_df
