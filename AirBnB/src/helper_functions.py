@@ -115,7 +115,7 @@ def calculate_host_approval_rate(df, interval='D', variable=None, value=None):
         else:
             raise ValueError(f"Column '{variable}' not found in DataFrame")
 
-    df = df[df_resampled['contact_channel_first'] != 'instant_book']
+    df = df[df['contact_channel_first'] != 'instant_book']
     
     df['inquired'] = (~df.index.isna()).astype(int)
     df['inquiry_accepted'] = (~df['ts_accepted_at_first'].isna()).astype(int) * df['inquired']
