@@ -6,8 +6,7 @@ Hi! I'm Brandon Henley, a biomedical engineer. This repository showcases some of
 1. [Contact Information](#1-contact-information)
 2. [Time Series Analysis and Forecasting](#2-time-series-analysis-and-forecasting)
    
-   2.1 [Cardio: Closed-loop Model of the Baroreflex](#21-cardio-closed-loop-model-of-the-baroreflex)
-   
+   2.1 [Cardio: Closed-loop Model of the Baroreflex](#21-cardio-closed-loop-model-of-the-baroreflex)   
    2.2 [Diabetes: Blood Glucose Level Forecasting](#22-diabetes-blood-glucose-level-forecasting)
    
 3. [Classification](#3-classification)
