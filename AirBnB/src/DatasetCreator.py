@@ -31,13 +31,15 @@ def ts_extract(ts, unit = 'hour'):
 
 def create_dataset(df_master):
     
-    inquiry_date = pd.to_datetime(df_master['ts_interaction_first'])
-    reply_date = pd.to_datetime(df_master['ts_reply_at_first'])
-    accept_date = pd.to_datetime(df_master['ts_accepted_at_first'])
-    book_date = pd.to_datetime(df_master['ts_booking_at'])
+    df = df_master.copy()
 
-    checkin_date = pd.to_datetime(df_master['ds_checkin_first'])
-    checkout_date = pd.to_datetime(df_master['ds_checkout_first'])
+    inquiry_date = pd.to_datetime(df['ts_interaction_first'])
+    reply_date = pd.to_datetime(df['ts_reply_at_first'])
+    accept_date = pd.to_datetime(df['ts_accepted_at_first'])
+    book_date = pd.to_datetime(df['ts_booking_at'])
+
+    checkin_date = pd.to_datetime(df['ds_checkin_first'])
+    checkout_date = pd.to_datetime(df['ds_checkout_first'])
 
     dataset = pd.DataFrame()
 
@@ -47,16 +49,16 @@ def create_dataset(df_master):
     dataset['book_date'] = book_date
 
     # year, month, day, and hour
-    for phase in ['inquiry', 'reply', 'accept', 'book']:
-        dataset[f"{phase}_year"] = ts_extract(inquiry_date, 'year')
-        dataset[f"{phase}_month"] = ts_extract(reply_date, 'month')
-        dataset[f"{phase}_day"] = ts_extract(accept_date, 'day')
-        dataset[f"{phase}_hour"] = ts_extract(book_date, 'hour')
+    for unit in ['year', 'month', 'day', 'hour']:
+        dataset[f"inquiry_{unit}"] = ts_extract(inquiry_date, unit)
+        dataset[f"reply_{unit}"] = ts_extract(reply_date, unit)
+        dataset[f"accept_{unit}"] = ts_extract(accept_date, unit)
+        dataset[f"book_{unit}"] = ts_extract(book_date, unit)
 
     # inquiry type
     dataset['inquiry_type'] = df_master['contact_channel_first']
 
-    # replied?, accepted?, booked? 
+    # replied?, accepted?, booked?
     dataset['replied'] = (~reply_date.isna()).astype(int)
     dataset['accepted'] = (~accept_date.isna()).astype(int)
     dataset['booked'] = (~book_date.isna()).astype(int)
@@ -70,33 +72,33 @@ def create_dataset(df_master):
     dataset['stay_duration'] = ts_span(checkin_date, checkout_date, 'day')
 
     # past booker
-    dataset['past_booker'] = (df_master['guest_user_stage_first'] == 'past_booker').astype(int)
+    dataset['past_booker'] = (df['guest_user_stage_first'] == 'past_booker').astype(int)
 
     # id
     dataset['guest_id'] = df_master['id_guest_anon']
-    dataset['host_id'] = df_master['id_host_anon']
+    dataset['host_id'] = df['id_host_anon']
 
     # country
-    dataset['guest_country'] = df_master['guest_country']
-    dataset['host_country'] = df_master['host_country']
+    dataset['guest_country'] = df['guest_country']
+    dataset['host_country'] = df['host_country']
 
     # number of guests
-    dataset['n_guests']  = df_master['m_guests']
+    dataset['n_guests']  = df['m_guests']
 
     # number of  guest-host interactions
     dataset['n_interactions']  = df_master['m_interactions']
 
     # room type
-    dataset['room_type']  = df_master['room_type']
+    dataset['room_type']  = df['room_type']
 
     # number of reviews
-    dataset['n_reviews']  = df_master['total_reviews']
+    dataset['n_reviews']  = df['total_reviews']
 
     # Length of Guest's first message to host
-    dataset['guest_msg_length'] = df_master['m_first_message_length_in_characters']
+    dataset['guest_msg_length'] = df['m_first_message_length_in_characters']
 
     # Number of words in user's "about me"
-    dataset['n_guest_about_me_words'] = df_master['words_in_guest_profile']
-    dataset['n_host_about_me_words'] = df_master['words_in_host_profile']
-
+    dataset['n_guest_about_me_words'] = df['words_in_guest_profile']
+    dataset['n_host_about_me_words'] = df['words_in_host_profile']
+    
     return dataset
