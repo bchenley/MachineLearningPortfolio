@@ -101,6 +101,6 @@ def generate_timeseries(df, interval='D', segments = None, values = None):
     month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October' , 'November', 'December']
     master_df['month'] = pd.Categorical(master_df['month'], categories = month_order, ordered = True)
     
-    master_df['year'] = master_df.index.year_name()
+    master_df['year'] = master_df.index.year
 
     return master_df
