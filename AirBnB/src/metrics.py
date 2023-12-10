@@ -374,6 +374,35 @@ def calculate_avg_engagement(df, interval='D', variable=None, value=None):
 
     return avg_engagement
 
+# Average number of reviews
+def calculate_avg_reviews(df, interval='D', variable=None, value=None):
+    
+    df = df.copy()
+
+    # df['ts_interaction_first'] = pd.to_datetime(df['ts_interaction_first'])    
+    # df.set_index('ts_interaction_first', inplace=True)
+    
+    # df.index.name = 'inquiry_date'
+    
+    if variable is not None and value is not None:
+        if variable in df.columns:
+            df = df[df[variable] == value]
+        else:
+            raise ValueError(f"Column '{variable}' not found in DataFrame")
+
+    avg_reviews = df.resample(interval).agg({'total_reviews': 'mean'})
+
+    avg_reviews = avg_reviews.fillna(0)
+    
+    avg_reviews = avg_reviews['total_reviews']
+    
+    if variable is not None and value is not None:
+        avg_reviews.name = f"avg_reviews_{variable}_{value}"
+    else:
+        avg_reviews.name = 'avg_reviews'
+
+    return avg_reviews
+    
 # IQR Outliers
 def iqr_outlier(df_col, ordered=False):
     
