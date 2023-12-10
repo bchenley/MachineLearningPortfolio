@@ -20,5 +20,5 @@ Beat-to-beat time series data of systemic arterial blood pressure and heart rate
 ### 2.2 Diabetes: Blood Glucose Level Forecasting
 Predicting blood glucose levels is crucial for diabetic patients in planning their meal and insulin doses. The application of a CNN-LSTM model to this problem showcases the convergence of biomedical data with advanced machine learning techniques for practical healthcare implications. I use continuous blood glucose level, insulin doses, and dietary intake data to develop a CNN-LSTM model in PyTorch that forecasts 90 minutes of blood glucose levels, achieving an RMSE of 24.8 mg/dl.
 
-
+## 3. Airbnb Booking Prediction
 
