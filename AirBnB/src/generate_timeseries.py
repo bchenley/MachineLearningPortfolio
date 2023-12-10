@@ -1,6 +1,6 @@
 import pandas as pd
 
-from . import (
+from .metrics import (
     calculate_inquiry_rate,
     calculate_listing_rate,
     calculate_avg_user_profile_completeness,
