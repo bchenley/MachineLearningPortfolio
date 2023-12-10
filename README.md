@@ -12,6 +12,7 @@ Hi! I'm Brandon Henley, a biomedical engineer. This repository showcases some of
 3. [Classification](#3-classification)
    
    3.1 [AirBnb: Booking Prediction](#31-airbnb-booking-prediction)
+   3.2 [BrainCancer: MRI-Based Brain Tumor Semantic Segmentation](#32-braincancer-mri-based-brain-tumor-semantic-segmentation)
 
 ## 1. Contact Information
 - **LinkedIn**: [Brandon Henley](https://www.linkedin.com/in/bchenley/)
@@ -28,4 +29,6 @@ Predicting blood glucose levels is crucial for diabetic patients in planning the
 ## 3. Classification
 
 ### 3.1 Airbnb: Booking Prediction
+
+### 3.2 BrainCancer: MRI-Based Brain Tumor Semantic Segmentation
 
