@@ -1,3 +1,5 @@
+from sklearn.metrics import roc_curve
+
 def get_classification_results(model, X, y):
 
   # Labels
