@@ -1,8 +1,8 @@
-def train_test_split_(df: pd.DataFrame,
-                      stratify_on = None,
-                      train_size = 0.8,
-                      random_state = None,
-                      reset_index = False):
+def train_test_split_data(df: pd.DataFrame,
+                          stratify_on = None,
+                          train_size = 0.8,
+                          random_state = None,
+                          reset_index = False):
 
   df = df.copy()
 
