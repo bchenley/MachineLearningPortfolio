@@ -1,7 +1,7 @@
-import torch
+import torch.utils.data import Dataset
 import pandas as pd
 
-class BasicDataset(torch.utils.data.Dataset):
+class BasicDataset(Dataset):
     def __init__(self, 
                  X, y, 
                  X_dtype = torch.float32, y_dtype = torch.long):
