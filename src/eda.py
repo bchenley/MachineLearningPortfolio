@@ -1,3 +1,15 @@
+import pandas as pd
+
+def describe(df):
+  df_ = pd.concat([df.dtypes, df.nunique()], axis = 1)
+  df_.columns = ['Dtype', 'Cardinality']
+  
+  df_['Unknown'] = 0
+  for col in df_.index:
+    df_.loc[df_.index == col, 'Unknown'] = (df[col] == 'unknown').sum()
+
+  return df_
+    
 def annotate_bar(ax, show_height = True, show_percent = False):
     """
     Display the count and optional percentage on top of each bar in a bar plot.
