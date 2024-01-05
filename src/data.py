@@ -1,4 +1,4 @@
-import torch.utils.data import Dataset
+from torch.utils.data import Dataset
 import pandas as pd
 
 class BasicDataset(Dataset):
