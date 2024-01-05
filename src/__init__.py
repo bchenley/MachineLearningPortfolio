@@ -4,4 +4,4 @@ from . import eda
 from . import plot
 from . import metrics
 from . import model_selection
-from . import trainer
+from . import training
