@@ -1,2 +1,7 @@
-from .eda import annotate_bar.annotate_bar as annotate_bar
-from .eda import describe.describe as describe
+from . import data
+from . import classification
+from . import eda
+from . import plot
+from . import metrics
+from . import model_selection
+from . import trainer
