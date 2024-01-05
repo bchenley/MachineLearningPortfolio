@@ -1,2 +1,2 @@
-from .eda.annotate_bar import annotate_bar
-from .eda.describe import describe
+from . import eda.annotate_bar as annotate_bar
+from . import eda.describe as describe
