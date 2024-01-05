@@ -1,3 +1,5 @@
+import pandas as pd
+
 def describe(df):
   df_ = pd.concat([df.dtypes, df.nunique()], axis = 1)
   df_.columns = ['Dtype', 'Cardinality']
