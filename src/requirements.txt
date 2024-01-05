@@ -1,0 +1,12 @@
+pandas
+numpy
+torch
+pytorch_lightning
+torchvision
+tensorflow
+scipy
+matplotlib
+seaborn
+plotly
+dtale
+statsmodels
