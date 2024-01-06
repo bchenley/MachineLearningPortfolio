@@ -1,12 +1,21 @@
 import pandas as pd
 
 def describe(df):
-  df_ = pd.concat([df.dtypes, df.nunique()], axis = 1)
-  df_.columns = ['Dtype', 'Cardinality']
+
+  df = df.copy()
+  df_mode = df.mode(axis = 0).apply(lambda x: ', '.join(x.dropna().astype(str)), axis = 0)
   
+  df_ = pd.concat([df_mode, df.dtypes, df.nunique()], axis = 1)
+  df_.columns = ['Mode', 'Dtype', 'Cardinality']
+  
+  df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
+
   df_['Unknown'] = 0
-  for col in df_.index:
-    df_.loc[df_.index == col, 'Unknown'] = (df[col] == 'unknown').sum()
+  for var in df_.index:
+    
+    df_.loc[df_.index == var, 'Unknown'] = (df[var] == 'unknown').sum()
+  
+  df_['count'] = df.count()
 
   return df_
     
