@@ -1,6 +1,6 @@
 import pandas as pd
 
-def describe(df):
+def describe(df, missing_values = []):
 
   df = df.copy()
   df_mode = df.mode(axis = 0).apply(lambda x: ', '.join(x.dropna().astype(str)), axis = 0)
@@ -10,10 +10,10 @@ def describe(df):
   
   df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
 
-  df_['Unknown'] = 0
+  missing_values = [np.nan] + missing_values
+  df_['missing'] = 0
   for var in df_.index:
-    
-    df_.loc[df_.index == var, 'Unknown'] = ((df[var] == 'unknown') | df.isna()).sum()
+    df_.loc[df_.index == var, 'missing'] = df[var].map(lambda x: x in missing_values).sum()
   
   df_['count'] = df.count()
 
