@@ -13,7 +13,7 @@ def describe(df):
   df_['Unknown'] = 0
   for var in df_.index:
     
-    df_.loc[df_.index == var, 'Unknown'] = (df[var] == 'unknown').sum()
+    df_.loc[df_.index == var, 'Unknown'] = ((df[var] == 'unknown') | df.isna()).sum()
   
   df_['count'] = df.count()
 
