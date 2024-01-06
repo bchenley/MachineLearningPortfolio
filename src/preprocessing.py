@@ -21,4 +21,4 @@ def factorize(df, return_uniques = False):
     if return_uniques:
       categorical_uniques[col] = unqiues
   
-  return df_factorized, categorical_uniques if return_uniques else df_factorized
+  return (df_factorized, categorical_uniques) if return_uniques else df_factorized
