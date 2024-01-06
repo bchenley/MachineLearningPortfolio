@@ -19,6 +19,6 @@ def factorize(df, return_uniques = False):
     codes, unqiues = pd.factorize(df_factorized[col])
     df_factorized[col] = codes
     if return_uniques:
-      categorical_uniques[col] = unqiues.values
+      categorical_uniques[col] = unqiues.tolist()
   
   return (df_factorized, categorical_uniques) if return_uniques else df_factorized
