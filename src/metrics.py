@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def evaluate_classifier(model, X, y, scores = None):
 
-  y_pred = model.predict(model)
+  y_pred = model.predict(X)
   
   if scores is None:
     scores = {'accuracy': accuracy_score,
