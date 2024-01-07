@@ -68,10 +68,12 @@ class PrincipalComponentAnalysis():
     ax[0].set_xticks(np.arange(0, self.n_components))
     ax[0].set_xticklabels(np.arange(1, self.n_components+1))
     ax[0].set_xlabel('Eigen Value Order')
-
+  
     ax[1].stem(self.pct_cumsum, basefmt = " ")
     ax[1].yaxis.grid(True)
     ax[1].set_ylim([0, 1.01])
     ax[1].set_yticks(np.arange(0, 1.05, .1))
-    ax[1].set_ylabel('% Cumalative Contribution of Singular Values')
+    ax[1].set_ylabel('% Cumalative Contribution of Singular Values')  
+    ax[1].set_xticks(np.arange(0, self.n_components))
+    ax[1].set_xticklabels(np.arange(1, self.n_components+1))
     ax[1].set_xlabel('Principal Component')
