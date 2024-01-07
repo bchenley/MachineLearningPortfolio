@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 
-def evaluate_classifier(model, X, y, scores = None):
+def evaluate_classifier(model, X, y, scores = None, model_name = None):
 
   y_pred = model.predict(X)
   
@@ -16,7 +16,7 @@ def evaluate_classifier(model, X, y, scores = None):
   for name, func in scores.items():
     results[name] = func(y, y_pred)
   
-  results = pd.DataFrame(results)
+  results = pd.DataFrame(results, index = model_name if model_name is not None else 0)
   
   return results
 
