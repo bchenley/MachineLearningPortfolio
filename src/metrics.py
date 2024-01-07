@@ -1,7 +1,9 @@
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 
-def evaluate_classifier(y_true, y_pred, scores = None):
+def evaluate_classifier(model, X, y, scores = None):
+
+  y_pred = model.predict(model)
   
   if scores is None:
     scores = {'accuracy': accuracy_score,
@@ -9,26 +11,26 @@ def evaluate_classifier(y_true, y_pred, scores = None):
               'recall': recall_score,
               'f1': f1_score,
               'roc_auc': roc_auc_score}
-
+  
   results = {}
   for name, func in scores.items():
-    results[name] = func(y_true, y_pred)
-
+    results[name] = func(y, y_pred)
+  
   results = pd.DataFrame(results, index = scores)
   
   return results
 
-def get_classification_results(model, X, y):
-
+def get_classification_results(model, X, y, scores = None):
+  
   # Labels
   y_pred = model.predict(X)
   # Probabilities
   y_proba = model.predict_proba(X)[:,1]
   ## metrics
-  metrics = evaluate_classifier(y, y_pred)
+  metrics = evaluate_classifier(model, X, y, scores = scores)
   ## ROC curve
   fpr, tpr, _ = roc_curve(y, y_proba, drop_intermediate = False)
-
+  
   results = {'pred': y_pred,
              'proba': y_proba,
              'accuracy': metrics['accuracy'],
