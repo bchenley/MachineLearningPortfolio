@@ -26,8 +26,8 @@ def get_classification_results(model, X, y):
   ## ROC curve
   fpr, tpr, _ = roc_curve(y, y_proba, drop_intermediate = False)
 
-  results = {# 'pred': y_pred,
-             # 'proba': y_proba,
+  results = {'pred': y_pred,
+             'proba': y_proba,
              'accuracy': metrics['accuracy'],
              'precision': metrics['precision'],
              'f1': metrics['f1'],
