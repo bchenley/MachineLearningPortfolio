@@ -15,8 +15,8 @@ def evaluate_classifier(model, X, y, scores = None, model_name = None):
   results = {}
   for name, func in scores.items():
     results[name] = func(y, y_pred)
-  
-  results = pd.DataFrame(results, index = model_name if model_name is not None else 0)
+
+  results = pd.DataFrame(results, index = [model_name] if model_name is not None else [model.__class__.__name__])
   
   return results
 
