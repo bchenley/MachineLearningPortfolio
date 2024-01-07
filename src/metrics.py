@@ -1,3 +1,4 @@
+import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 
 def evaluate_classifier(y_true, y_pred, scores = None):
@@ -9,11 +10,13 @@ def evaluate_classifier(y_true, y_pred, scores = None):
               'f1': f1_score,
               'roc_auc': roc_auc_score}
 
-  result = {}
+  results = {}
   for name, func in scores.items():
-    result[name] = func(y_true, y_pred)
+    results[name] = func(y_true, y_pred)
 
-  return result
+  results = pd.DataFrame(results, index = scores)
+  
+  return results
 
 def get_classification_results(model, X, y):
 
