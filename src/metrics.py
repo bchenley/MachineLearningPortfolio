@@ -16,7 +16,7 @@ def evaluate_classifier(model, X, y, scores = None):
   for name, func in scores.items():
     results[name] = func(y, y_pred)
   
-  results = pd.DataFrame(results, index = scores)
+  results = pd.DataFrame(results)
   
   return results
 
