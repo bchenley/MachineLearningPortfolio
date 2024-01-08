@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 
-def calculate_scores(y_true, y_pred, scores = None, model_name = None):
+def calculate_scores(y_true, y_pred, scores = None):
   
   if scores is None:
     scores = {'accuracy': accuracy_score,
@@ -9,20 +9,20 @@ def calculate_scores(y_true, y_pred, scores = None, model_name = None):
               'recall': recall_score,
               'f1': f1_score,
               'roc_auc': roc_auc_score}
-  
+
   results = {}
   for name, func in scores.items():
     results[name] = func(y_true, y_pred)
 
-  results = pd.DataFrame(results, index = [model_name] if model_name is not None else [0])
-  
   return results
 
 def evaluate_classifier(model, X, y, scores = None, model_name = None):
 
   y_pred = model.predict(X)
 
-  results = calculate_scores(y, y_pred, scores = scores, model_name = model_name)
+  results = calculate_scores(y, y_pred, scores = scores)
+
+  results['model'] = model_name if model_name is not None else model.__class__.__name__
   
   return results
 
