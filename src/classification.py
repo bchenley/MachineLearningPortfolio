@@ -36,7 +36,7 @@ class LinearActivationClassifier(torch.nn.Module):
                 activation_fn = torch.nn.Sigmoid()
             else:
                 activation_fn = torch.nn.Identity()
-
+            
             self.sequential.add_module(f"linear_{i}", linear)
             self.sequential.add_module(f"activation_{i}", activation_fn)
             
@@ -52,7 +52,7 @@ class LinearActivationClassifier(torch.nn.Module):
 
         with torch.no_grad():
             output = self.sequential(input).to(self.y_dtype)
-
+        
         return output
         
 class LitClassifier(pl.LightningModule):
@@ -156,7 +156,7 @@ class LitClassifier(pl.LightningModule):
         
         # if self.track_parameters:
         #     for name, param in self.model.named_parameters():
-        #         self.train_history[f"step_{name}"].append(param.clone().detach().cpu().numpy())
+        #         self.train_history[f"step_{name}"].append(param.clone().detach().cpu())
             
     def on_train_epoch_end(self):
         
@@ -170,17 +170,17 @@ class LitClassifier(pl.LightningModule):
             self.train_history['epoch_loss'].append(epoch_loss_train)
         
             if self.scores is not None:
-                output_np = torch.concat(self.output_train, dim = 0).detach().cpu().numpy().squeeze()
-                output_pred_np = torch.concat(self.output_pred_train, dim = 0).detach().cpu().numpy().squeeze()
+                output = torch.concat(self.output_train, dim = 0).detach().cpu().squeeze()
+                output_pred = torch.concat(self.output_pred_train, dim = 0).detach().cpu().squeeze()
                 
                 if self.proba_threshold is not None:
-                    output_pred_np = (output_pred_np >= self.proba_threshold).astype(int)
+                    output_pred = output_pred >= self.proba_threshold
 
-                score_dict = evaluate_classifier(output_np, output_pred_np, self.scores)
+                scores_ = calculate_scores(output, output_pred, scores = self.scores)
 
-                self.train_scores = score_dict
+                self.train_scores = scores_
 
-                for key, value in score_dict.items():
+                for key, value in scores_.items():
 
                     if self.display_score is None:
                         prog_bar = False
@@ -193,7 +193,7 @@ class LitClassifier(pl.LightningModule):
 
         if self.track_parameters:
             for name, param in self.model.named_parameters():
-                self.train_history[f"epoch_{name}"].append(param.clone().detach().cpu().numpy())
+                self.train_history[f"epoch_{name}"].append(param.clone().detach().cpu())
 
         self.step_loss_train.clear()
         self.output_train.clear()
@@ -227,28 +227,28 @@ class LitClassifier(pl.LightningModule):
             self.val_history['epoch_loss'].append(epoch_loss_val)
 
             if self.scores is not None:
-                output_np = torch.concat(self.output_val, dim = 0).detach().cpu().numpy().squeeze()
-                output_pred_np = torch.concat(self.output_pred_val, dim = 0).detach().cpu().numpy().squeeze()
+                output = torch.concat(self.output_val, dim = 0).detach().cpu().squeeze()
+                output_pred = torch.concat(self.output_pred_val, dim = 0).detach().cpu().squeeze()
                 
                 if self.proba_threshold is not None:
-                    output_pred_np = (output_pred_np >= self.proba_threshold).astype(int)
+                    output_pred = output_pred >= self.proba_threshold
+                
+                scores_ = calculate_scores(output, output_pred, scores = self.scores)
 
-                score_dict = evaluate_classifier(output_np, output_pred_np, self.scores)
+                self.val_scores = scores_
 
-                self.val_scores = score_dict
+                for key, value in scores_.items():
 
-                for key, value in score_dict.items():
+                    if self.display_score is None:
+                        prog_bar = False
+                    else:
+                        prog_bar = key in self.display_score
 
                     if self.display_score is None:
                         prog_bar = False
                     else:
                         prog_bar = key in self.display_score
 
-                    if self.display_score is None:
-                        prog_bar = False
-                    else:
-                        prog_bar = key in self.display_score
-                        
                     self.log(f"val_{key}", value, on_epoch = True, prog_bar = prog_bar, logger = True)
 
                     self.val_history[f"epoch_{key}"].append(value)
@@ -280,17 +280,17 @@ class LitClassifier(pl.LightningModule):
         self.log('test_loss', epoch_loss_test, on_step = False, on_epoch = True, prog_bar = True, logger = True)
 
         if self.scores is not None:
-            output_np = torch.concat(self.output_test, dim = 0).detach().cpu().numpy().squeeze()
-            output_pred_np = torch.concat(self.output_pred_test, dim = 0).detach().cpu().numpy().squeeze()
+            output = torch.concat(self.output_test, dim = 0).detach().cpu().squeeze()
+            output_pred = torch.concat(self.output_pred_test, dim = 0).detach().cpu().squeeze()
             
             if self.proba_threshold is not None:
-                output_pred_np = (output_pred_np >= self.proba_threshold).astype(int)
+                output_pred = output_pred >= self.proba_threshold
 
-            score_dict = evaluate_classifier(output_np, output_pred_np, self.scores)
+            scores_ = calculate_scores(output, output_pred, scores = self.scores)
             
-            self.test_scores = score_dict
+            self.test_scores = scores_
 
-            for key, value in score_dict.items():
+            for key, value in scores_.items():
 
                 if self.display_score is None:
                     prog_bar = False
@@ -329,12 +329,12 @@ class LitClassifier(pl.LightningModule):
         if self.scores is not None:
 
             if self.proba_threshold is not None:
-                prediction = (prediction >= self.proba_threshold).astype(int)
+                prediction = int(prediction >= self.proba_threshold)
                 results['prediction'] = prediction
 
-            score_dict = evaluate_classifier(target, prediction, self.scores)
+            scores_ = calculate_scores(target, prediction, scores = self.scores)
 
-        results.update(score_dict)
+        results.update(scores_)
 
         self.prediction_results = results
 
