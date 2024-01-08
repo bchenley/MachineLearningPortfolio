@@ -44,6 +44,10 @@ class LinearActivationClassifier(torch.nn.Module):
 
         input = input.clone().to(self.device, self.X_dtype)
 
+        output = self.sequential(input).to(self.y_dtype)
+
+        return output
+        
 class LitClassifier(pl.LightningModule):
     def __init__(self, 
                  model, criterion, optimizer,
