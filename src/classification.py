@@ -48,10 +48,16 @@ class LinearActivationClassifier(torch.nn.Module):
 
         return output
     
-    def predict(self, input):
+    def predict_proba(self, input):
 
         with torch.no_grad():
             output = self.sequential(input).to(self.y_dtype)
+        
+        return output
+
+    def predict(self, input, threshold = 0.5):
+
+        output = self.predict_proba(input).to(int)
         
         return output
         
