@@ -156,3 +156,43 @@ class Descriptor:
         outlier_idx = np.where(outliers)
 
         return outlier_values, outlier_idx
+
+def plot_outliers(df, axis=0, range=[25, 75], scale=1.5, 
+                    fig_num = None, figsize = None):
+
+  numeric_cols = df.select_dtypes(include = ['number']).columns.to_list()
+  
+  # Count the number of columns with outliers
+  num_outliers = sum([len(Descriptor(df[col]).outliers(axis=axis, range=range, scale=scale)[0]) > 0 for col in numeric_cols])
+
+  # Calculate the grid size for subplots
+  nrows = ncols = int(np.ceil(np.sqrt(num_outliers)))
+
+  # Set default figsize if not provided
+  if figsize is None:
+      figsize = (5 * ncols, 5 * nrows)
+
+  fig, ax = plt.subplots(nrows, ncols, figsize=figsize, num=fig_num)
+
+  x = np.arange(df.shape[0])
+
+  axf = ax.flatten()
+  j = -1
+  for i,col in enumerate(numeric_cols):
+
+    descriptor = Descriptor(df[col])
+    
+    outliers, outlier_x = descriptor.outliers(axis = axis, 
+                                              range = range, 
+                                              scale = scale)
+
+    if len(outliers) > 0:      
+      j += 1      
+      axf[j].plot(x, df[col].values, 'k', label = 'Data')
+      axf[j].plot(outlier_x[0], outliers, '.r', label = 'Outliers')
+      axf[j].set_title(f"Outliers in {col}")
+      axf[j].set_xlabel("Index")
+      axf[j].legend()
+
+  plt.tight_layout()
+  plt.show()
