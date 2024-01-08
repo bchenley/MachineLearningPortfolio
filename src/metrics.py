@@ -22,7 +22,7 @@ def evaluate_classifier(model, X, y, scores = None, model_name = None):
 
   results = calculate_scores(y, y_pred, scores = scores)
 
-  results['model'] = model_name if model_name is not None else model.__class__.__name__
+  # results['model'] = model_name if model_name is not None else model.__class__.__name__
   
   return results
 
