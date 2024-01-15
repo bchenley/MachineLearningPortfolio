@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import FunctionTransformer, StandardScaler, MinMaxScaler
 
-def log_transform(X, y = None, small_constant = 1e-10):
-  X_t = np.log(X + np.max([small_constant, X.min()]))    
+def log_transform(X, y = None, small_constant = 1e-10):  
+  X_t = np.log(X - X.min() + small_constant)    
   return X_t
 
 def sqrt_transform(X, y = None, small_constant = 1e-10):
