@@ -56,109 +56,124 @@ def annotate_bar(ax, show_height = True, show_percent = False):
         ax.annotate(note, (x, y), ha='center', va='bottom')
 
 class Descriptor:
-    """
-    A class for computing descriptive statistics and identifying outliers in data.
+  """
+  A class for computing descriptive statistics and identifying outliers in data.
 
-    Parameters:
-    data (numpy.ndarray): The input data for which descriptive statistics and outliers will be computed.
-    """
+  Parameters:
+  data (numpy.ndarray): The input data for which descriptive statistics and outliers will be computed.
+  """
 
-    def __init__(self, data):
-        """
-        Initialize the Descriptor object with the input data.
+  def __init__(self, data):
+      """
+      Initialize the Descriptor object with the input data.
 
-        Parameters:
-        data (numpy.ndarray): The input data for which descriptive statistics and outliers will be computed.
-        """
-        self.data = data
+      Parameters:
+      data (numpy.ndarray): The input data for which descriptive statistics and outliers will be computed.
+      """
+      self.data = data
 
-    def mean(self, axis=0):
-        """
-        Compute the mean of the data along the specified axis.
+  def sign(self, idx = None, axis = 0):
 
-        Parameters:
-        axis (int, optional): The axis along which to compute the mean (default is 0).
+    return np.sign(self.data[idx]) if idx is not None else np.sign(self.data)
 
-        Returns:
-        numpy.ndarray: The mean values computed along the specified axis.
-        """
-        return self.data.mean(axis=axis)
+  def mean(self, axis=0):
+      """
+      Compute the mean of the data along the specified axis.
 
-    def median(self, axis=0):
-        """
-        Compute the median of the data along the specified axis.
+      Parameters:
+      axis (int, optional): The axis along which to compute the mean (default is 0).
 
-        Parameters:
-        axis (int, optional): The axis along which to compute the median (default is 0).
+      Returns:
+      numpy.ndarray: The mean values computed along the specified axis.
+      """
+      return self.data.mean(axis=axis)
 
-        Returns:
-        numpy.ndarray: The median values computed along the specified axis.
-        """
-        return np.median(self.data, axis=axis)
+  def median(self, axis=0):
+      """
+      Compute the median of the data along the specified axis.
 
-    def mode(self, axis=0):
-        """
-        Compute the mode and count of the mode values in the data along the specified axis.
+      Parameters:
+      axis (int, optional): The axis along which to compute the median (default is 0).
 
-        Parameters:
-        axis (int, optional): The axis along which to compute the mode (default is 0).
+      Returns:
+      numpy.ndarray: The median values computed along the specified axis.
+      """
+      return np.median(self.data, axis=axis)
 
-        Returns:
-        numpy.ndarray: The mode values computed along the specified axis.
-        numpy.ndarray: The count of occurrences of the mode values computed along the specified axis.
-        """
-        mode_, count_ = stats.mode(self.data, axis=axis)
-        return mode_, count_
+  def mode(self, axis=0):
+      """
+      Compute the mode and count of the mode values in the data along the specified axis.
 
-    def sdev(self, axis=0, ddof=0):
-        """
-        Compute the standard deviation of the data along the specified axis.
+      Parameters:
+      axis (int, optional): The axis along which to compute the mode (default is 0).
 
-        Parameters:
-        axis (int, optional): The axis along which to compute the standard deviation (default is 0).
-        ddof (int, optional): The delta degrees of freedom used in the calculation (default is 0).
+      Returns:
+      numpy.ndarray: The mode values computed along the specified axis.
+      numpy.ndarray: The count of occurrences of the mode values computed along the specified axis.
+      """
+      mode_, count_ = stats.mode(self.data, axis=axis)
+      return mode_, count_
 
-        Returns:
-        numpy.ndarray: The standard deviation values computed along the specified axis.
-        """
-        return self.data.std(axis=axis, ddof=ddof)
+  def sdev(self, axis=0, ddof=0):
+      """
+      Compute the standard deviation of the data along the specified axis.
 
-    def iqr(self, axis=0, range=[25, 75]):
-        """
-        Compute the interquartile range (IQR) of the data along the specified axis.
+      Parameters:
+      axis (int, optional): The axis along which to compute the standard deviation (default is 0).
+      ddof (int, optional): The delta degrees of freedom used in the calculation (default is 0).
 
-        Parameters:
-        axis (int, optional): The axis along which to compute the IQR (default is 0).
-        range (list, optional): The percentiles used to define the IQR (default is [25, 75]).
+      Returns:
+      numpy.ndarray: The standard deviation values computed along the specified axis.
+      """
+      return self.data.std(axis=axis, ddof=ddof)
 
-        Returns:
-        numpy.ndarray: The IQR values computed along the specified axis.
-        """
-        return stats.iqr(self.data, axis=axis, rng=range)
+  def iqr(self, axis=0, range=[25, 75]):
+      """
+      Compute the interquartile range (IQR) of the data along the specified axis.
 
-    def outliers(self, axis=0, range=[25, 75], scale=1.5):
-        """
-        Identify outliers in the data along the specified axis using the IQR method.
+      Parameters:
+      axis (int, optional): The axis along which to compute the IQR (default is 0).
+      range (list, optional): The percentiles used to define the IQR (default is [25, 75]).
 
-        Parameters:
-        axis (int, optional): The axis along which to identify outliers (default is 0).
-        range (list, optional): The percentiles used to define the IQR (default is [25, 75]).
-        scale (float, optional): The scaling factor to adjust the IQR threshold (default is 1.5).
+      Returns:
+      numpy.ndarray: The IQR values computed along the specified axis.
+      """
+      return stats.iqr(self.data, axis=axis, rng=range)
 
-        Returns:
-        numpy.ndarray: The values of outliers identified along the specified axis.
-        tuple: A tuple containing the indices of outliers along the specified axis.
-        """
-        iqr = self.iqr(axis=axis, range=range)
-        lower_threshold = np.quantile(self.data, q=range[0]/100., axis=axis) - scale * iqr
-        upper_threshold = np.quantile(self.data, q=range[1]/100., axis=axis) + scale * iqr
+  def outliers(self, axis=0, range = [25, 75], scale=1.5):
+      """
+      Identify outliers in the data along the specified axis using the IQR method.
 
-        outliers = (self.data < lower_threshold) | (self.data > upper_threshold)
+      Parameters:
+      axis (int, optional): The axis along which to identify outliers (default is 0).
+      range (list, optional): The percentiles used to define the IQR (default is [25, 75]).
+      scale (float, optional): The scaling factor to adjust the IQR threshold (default is 1.5).
 
-        outlier_values = self.data[outliers]
-        outlier_idx = np.where(outliers)
+      Returns:
+      numpy.ndarray: The values of outliers identified along the specified axis.
+      tuple: A tuple containing the indices of outliers along the specified axis.
+      """
+      iqr = self.iqr(axis=axis, range=range)
+      lower_threshold = np.quantile(self.data, q=range[0]/100., axis=axis) - scale * iqr
+      upper_threshold = np.quantile(self.data, q=range[1]/100., axis=axis) + scale * iqr
 
-        return outlier_values, outlier_idx
+      outliers = (self.data < lower_threshold) | (self.data > upper_threshold)
+
+      outlier_values = self.data[outliers]
+      outlier_idx = np.where(outliers)
+
+      return outlier_values, outlier_idx
+
+  def clip(self, axis=0, range = [25, 75], scale=1.5):
+
+    _, outlier_idx = self.outliers(axis = axis, range = range, scale = scale)
+    
+    data_clipped = self.data.copy()
+    
+    data_clipped[outlier_idx[0]] = self.median(axis=axis) + self.sign(idx=outlier_idx[0], axis=axis) * self.iqr(axis=axis, range=range)
+
+    return data_clipped
+
 
 def plot_outliers(df, axis=0, range=[25, 75], scale=1.5, 
                     fig_num = None, figsize = None):
