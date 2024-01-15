@@ -13,10 +13,10 @@ def describe(df, missing_values = []):
   
   df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
 
-  missing_values = [np.nan] + missing_values
+  missing_values = missing_values
   df_['missing'] = 0
   for var in df_.index:
-    df_.loc[df_.index == var, 'missing'] = df[var].map(lambda x: x in missing_values).sum()
+    df_.loc[df_.index == var, 'missing'] = (pd.isna(df[var]) | df[var].map(lambda x: x in missing_values)).sum()
   
   df_['count'] = df.count()
 
