@@ -65,10 +65,10 @@ def fft(x, fs=1, axes=0, nfft=None, norm='backward'):
     # Only take the positive frequencies and corresponding FFT values
     if s % 2 == 0:
         freq = freq[:s//2]
-        x_fft = x_fft[:s//2, :]
+        x_fft = x_fft[:s//2]
     else:
         freq = freq[:(s//2 + 1)]
-        x_fft = x_fft[:(s//2 + 1), :]
+        x_fft = x_fft[:(s//2 + 1)]
 
     # Calculate magnitude and phase
     x_fft_mag = np.abs(x_fft)
