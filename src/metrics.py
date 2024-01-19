@@ -1,6 +1,15 @@
 import pandas as pd
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, precision_score, recall_score, \
+                            f1_score, roc_auc_score, roc_curve, \
+                            mean_squared_error, mean_squared_log_error, \
+                            mean_absolute_error
 
+def root_mean_squared_error(y_true, y_pred):
+    return torch.sqrt(mean_squared_error(y_true, y_pred))
+  
+def root_mean_squared_log_error(y_true, y_pred):
+    return torch.sqrt(mean_squared_log_error(y_true, y_pred))
+  
 def calculate_scores(y_true, y_pred, scores = None):
   
   if scores is None:
