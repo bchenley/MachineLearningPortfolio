@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, \
                             f1_score, roc_auc_score, roc_curve, \
                             mean_squared_error, mean_squared_log_error, \
                             mean_absolute_error
+import torch
 
 def root_mean_squared_error(y_true, y_pred):
     return torch.sqrt(mean_squared_error(y_true, y_pred))
