@@ -96,12 +96,12 @@ class RMSLELoss(torch.nn.modules.loss._Loss):
 
   def forward(self, input, target):
 
-    if (input < 0).any() & ~(input < 0).any():
-      raise ValueError("input has negative values")
-    elif ~(input < 0).any() & (input < 0).any():
-      raise ValueError("target has negative values")
-    elif (input < 0).any() & (input < 0).any():
-      raise ValueError("both the input and target have negative values")
+    if (input < 0).any() & ~(target < 0).any():
+      raise ValueError("prediction has negative values.")
+    elif ~(input < 0).any() & (target < 0).any():
+      raise ValueError("target has negative values.")
+    elif (input < 0).any() & (target < 0).any():
+      raise ValueError("both the prediction and target have negative values.")
     
     loss = torch.nn.MSELoss(reduction = self.reduction)(torch.log1p(input), torch.log1p(target)).sqrt()
 
