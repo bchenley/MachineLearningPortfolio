@@ -102,7 +102,7 @@ class Criterion():
       # Normalized Mean Squared Error
       if self.dims is not None: criterion = (y_true - y_pred).pow(2).nansum(dim = self.dims) / y_true.pow(2).nansum(dim=self.dims)
       else: criterion = (y_true - y_pred).abs() / y_true.pow(2)
-    elif self.name == 'msle':
+    elif self.name == 'rmsle':
       # Root mean squared logarithmic error
       if self.dims is not None: criterion = ((y_true+1).log() - (y_pred+1).log()).pow(2).nanmean(dim = self.dims).sqrt()                                            
       else: criterion = ((y_true+1).log() - (y_pred+1).log()).pow(2).sqrt()
