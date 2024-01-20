@@ -6,10 +6,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, \
 import torch
 
 def root_mean_squared_error(y_true, y_pred):
-    return torch.sqrt(mean_squared_error(y_true, y_pred))
-  
+    return np.sqrt(mean_squared_error(y_true, y_pred))
+
 def root_mean_squared_log_error(y_true, y_pred):
-    return torch.sqrt(mean_squared_log_error(y_true, y_pred))
+    return root_mean_squared_error(np.log1p(y_true), np.log1p(y_pred))
   
 def calculate_scores(y_true, y_pred, scores = None):
   
