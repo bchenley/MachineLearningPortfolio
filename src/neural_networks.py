@@ -3,6 +3,204 @@ import pytorch_lightning as pl
 import numpy as np
 import pandas as pd
 
+## Custom RNN network
+class CustomRNN(torch.nn.Module):
+    def __init__(self,
+                 input_size, output_size = 1, input_len = 1, output_len = 1,
+                 rnn_type = 'lstm',
+                 stateful = False,
+                 hidden_size = 32, 
+                 rnn_num_layers = 1, 
+                 rnn_bias = True, 
+                 rnn_batch_first = True, 
+                 rnn_dropout = 0, 
+                 rnn_bidirectional = False,
+                 lstm_proj_size = 0, 
+                 rnn_weight_reg = [0.001, 1],
+                 output_out_features = [1], 
+                 output_bias = [True], 
+                 output_weight_reg = [0.001, 1], 
+                 output_activation = ['relu'],
+                 output_degree = [1], 
+                 output_coef_init = [None], output_coef_train = [False], output_coef_reg = [[0.001, 1]], 
+                 output_zero_order = [False], 
+                 output_batch_norm = [False], 
+                 output_regularize_linear = False, output_regularize_activation = False,
+                 device = 'cpu', X_dtype = torch.float32, y_dtype = torch.float32):
+            
+        super(CustomRNN, self).__init__()
+        
+        # Store the arguments as attributes
+        locals_ = locals().copy()
+        for arg in locals_:
+            if arg != 'self':
+                setattr(self, arg, locals_[arg])
+        
+        if self.rnn_type == 'lstm':
+          self.rnn = torch.nn.LSTM(input_size = self.input_size, 
+                                   hidden_size = self.hidden_size, 
+                                   num_layers = self.rnn_num_layers, 
+                                   bias = self.rnn_bias, 
+                                   batch_first = self.rnn_batch_first, 
+                                   dropout = self.rnn_dropout, 
+                                   bidirectional = self.rnn_bidirectional, 
+                                   proj_size = self.lstm_proj_size, 
+                                   device = self.device, dtype = self.X_dtype)
+        if self.rnn_type == 'gru':
+          self.rnn = torch.nn.GRU(input_size = self.input_size, 
+                                   hidden_size = self.hidden_size, 
+                                   num_layers = self.rnn_num_layers, 
+                                   bias = self.rnn_bias, 
+                                   batch_first = self.rnn_batch_first, 
+                                   dropout = self.rnn_dropout, 
+                                   bidirectional = self.rnn_bidirectional,       
+                                   device = self.device, dtype = self.X_dtype)
+
+        self.output_block = CustomSequential(in_features = self.hidden_size, 
+                                             layer_out_features  = self.output_out_features, 
+                                             layer_bias  = self.output_bias, 
+                                             layer_weight_reg  = self.output_weight_reg, 
+                                             layer_activation  = self.output_activation, 
+                                             layer_degree  = self.output_degree, 
+                                             layer_coef_init  = self.output_coef_init, 
+                                             layer_coef_train  = self.output_coef_train, 
+                                             layer_coef_reg  = self.output_coef_reg, 
+                                             layer_zero_order  = self.output_zero_order, 
+                                             layer_batch_norm  = self.output_batch_norm, 
+                                             regularize_linear  = self.output_regularize_linear, 
+                                             regularize_activation  = self.output_regularize_activation, 
+                                             device  = self.device, dtype  = self.X_dtype)
+
+    def forward(self, input, hiddens = None):
+        
+      input = input.clone().to(self.device, self.X_dtype)
+      
+      if not self.stateful:
+        hiddens = None
+
+      rnn_out, hiddens = self.rnn(input, hiddens)
+
+      out = rnn_out[:, -self.output_len:, :]
+
+      output = self.output_block(out).to(dtype = self.y_dtype)
+
+      return output, hiddens
+      
+    def predict(self, input, hiddens = None):
+        
+        with torch.no_grad():
+            output, hiddens = self.forward(input, hiddens = hiddens)
+        
+        return output, hiddens
+                                  
+    def penalty_score(self):
+      penalty_fn = lambda reg, param: reg[0]*torch.norm(param.detach(), p = reg[1]) * int(param.requires_grad)
+      
+      penalty = 0
+
+      if self.regularize_rnn:       
+        for weight in [self.rnn.weight_ih_l0, self.rnn.weight_hh_l0]:
+          penalty += penalty_fn(self.rnn_weight_reg, weight)
+
+      if self.regularize_linear:
+        penalty += penalty_fn(self.linear_weight_reg ,self.linear.weight)
+
+      if self.output_activation == 'polynomial':
+        penalty += self.output_activation_fn.regularize()
+      
+      return penalty
+
+## Custom module employing multiple layers of linear transformation with nonlinear activation
+class CustomSequential(torch.nn.Module):
+  def __init__(self,
+               in_features, layer_out_features = [1],
+               layer_bias = [True],
+               layer_weight_reg = [0.001, 1],
+               layer_activation = ['relu'],
+               layer_degree = [1],
+               layer_coef_init = [None],
+               layer_coef_train = [False],
+               layer_coef_reg = [[0.001, 1]],
+               layer_zero_order = [False],
+               layer_batch_norm = [False],
+               regularize_linear = False,
+               regularize_activation = False,
+               device = 'cpu', dtype = torch.float32):
+  
+    super(CustomSequential, self).__init__()
+    
+    # Store the arguments as attributes
+    locals_ = locals().copy()
+    for arg in locals_:
+      if arg != 'self':
+        if 'layer_' in arg:
+          if len(locals_[arg]) == 1:
+            locals_[arg] = locals_[arg] * len(layer_out_features)
+          
+        setattr(self, arg, locals_[arg])
+    
+    self.num_layers = len(self.layer_out_features)
+
+    self.sequential = torch.nn.Sequential()
+    for i in range(self.num_layers):
+      if i == 0:
+        in_features = self.in_features
+      else:
+        in_features = self.layer_out_features[i-1]
+
+      self.sequential.add_module('linear_' + str(i+1),
+                                 torch.nn.Linear(in_features = in_features, 
+                                                 out_features = self.layer_out_features[i],
+                                                 bias = self.layer_bias[i],
+                                                 device = self.device, dtype = self.dtype))
+      if self.layer_batch_norm[i]:
+        self.sequential.add_module('batch_norm_' + str(i+1),
+                                  torch.nn.BatchNorm1d(num_features = self.layer_out_features[i],
+                                                       device = self.device, dtype = self.dtype))
+
+      if self.layer_activation[i] == 'relu':
+        self.sequential.add_module('activation_' + str(i+1),
+                                   torch.nn.ReLU())
+      elif self.layer_activation[i] == 'softmax':
+        self.sequential.add_module('activation_' + str(i+1),
+                                   torch.nn.Softmax(dim = -1))
+      elif self.layer_activation[i] == 'sigmoid':
+        self.sequential.add_module('activation_' + str(i+1),
+                                   torch.nn.Sigmoid())
+      elif self.layer_activation[i] == 'polynomial':
+        self.sequential.add_module('activation_' + str(i+1),
+                                   Polynomial(in_features = self.layer_out_features[i], 
+                                              degree = self.layer_degree[i], 
+                                              coef_init = self.layer_coef_init[i], 
+                                              coef_train = self.layer_coef_train[i],
+                                              coef_reg = self.layer_coef_reg[i], 
+                                              zero_order = self.layer_zero_order[i], 
+                                              device = self.device, dtype = self.dtype))
+      
+    else:
+      self.activation_fn = torch.nn.Identity()
+
+  def forward(self, input):
+    output = self.sequential(input)
+    return output
+
+  def penalty_score(self):
+    penalty_fn = lambda reg, param: reg[0]*torch.norm(param.detach(), p = reg[1]) * int(param.requires_grad)
+    
+    penalty = 0.
+    if self.regularize_linear:
+      for name, param in self.sequential.named_parameters():
+        if ('linear' in name) & ('weight' in name):
+          penalty += penalty_fn(self.layer_weight_reg, param)
+
+    if self.regularize_activation:      
+      for layer in self.sequential:
+        if layer.__class__.__name__ == 'Polynomial':
+          penalty += layer.penalty_score()
+
+    return penalty
+
+## Classification network using a simple linear block with nonlinear activation
 class LinearActivationClassifier(torch.nn.Module):
     def __init__(self,
                  in_features, out_features = [1], activations = [None],
@@ -96,6 +294,7 @@ class Polynomial(torch.nn.Module):
   def penalty_score(self):
     return self.coef_reg[0] * torch.norm(self.coef, p = self.coef_reg[1]) * int(self.coef.requires_grad)
 
+## Pytorch Lightning module for classification networkds
 class LitClassifier(pl.LightningModule):
     def __init__(self, 
                  model, criterion, optimizer,
@@ -386,111 +585,7 @@ class LitClassifier(pl.LightningModule):
 
         return output
 
-class RegressionTrainer(pl.Trainer):
-    def __init__(self, 
-                 max_epochs = None):
-        
-        super().__init__(max_epochs = max_epochs)
-        
-    def fit_model(self, 
-                  pl_model, 
-                  train_dataloaders, val_dataloaders = None, 
-                  model_to_device = 'cpu'):
-
-        self.fit(model = pl_model, 
-                 train_dataloaders = train_dataloaders,
-                 val_dataloaders = val_dataloaders)
-        
-        pl_model.model.to(model_to_device)
-        
-    def test_model(self, test_dataloaders):
-        
-        self.test(model = self.model,
-                  dataloaders = test_dataloaders)
-
-    def plot_performance(self, 
-                         metrics = None,
-                         figsize = None,
-                         fig_num = None):
-        
-        # loss
-        fig = plt.figure(num = fig_num, figsize = figsize)
-
-        loss_ax = fig.add_subplot(1,1, 1)
-        loss_ax.plot(self.model.train_history['epoch'], 
-                     self.model.train_history['epoch_loss'], 'k', label = 'Train')
-        if len(self.model.val_history['epoch']) > 0:
-            loss_ax.plot(self.model.val_history['epoch'], 
-                        self.model.val_history['epoch_loss'], 'r', label = 'Val')
-        loss_ax.grid()
-        loss_ax.set_xlabel('Epochs')
-        loss_ax.set_ylabel(self.model.criterion._get_name())
-        loss_ax.legend()
-
-        # metrics
-        if metrics is not None:
-          m = 1
-          for metric in metrics:
-            m += 1
-            metric_ax = fig.add_subplot(m+1, 1, m)
-
-            metric_ax.plot(self.model.train_history['epoch'], 
-                            self.model.train_history[f"epoch_{metric}"], 'k', label = 'Train')
-            
-            if len(self.model.val_history['epoch']) > 0:
-                metric_ax.plot(self.model.val_history['epoch'], 
-                            self.model.val_history[f"epoch_{metric}"], 'r', label = 'Val')
-            metric_ax.grid()
-            metric_ax.set_xlabel('Epochs')
-            metric_ax.set_ylabel(self.model.criterion._get_name())
-
-            metric_ax.legend()
-        
-    def plot_params(self,                                           
-                    params = 'all',
-                    figsize = None, 
-                    fig_num = None):
-
-        fig = plt.figure(num = fig_num, figsize = figsize)
-
-        p = 0
-        for name, _ in self.model.named_parameters():
-            if (params == 'all') | np.isin(name, params):
-                p += 1
-                param_ax = fig.add_subplot(p,1,p-1)
-
-                param_ax.plot(self.model.train_history['epoch'],
-                               self.model.train_history[f"epoch_{name}"])
-                param_ax.xlabel('Epochs')
-                param_ax.ylabel(name)
-                param_ax.grid()
-
-    def summarise_results(self):
-
-        results = pd.DataFrame({key: [value] for key,value in self.model.train_scores.items()},
-                               index = ['Train'])
-            
-        if self.model.val_scores is not None:
-            val_results = pd.DataFrame({key: [value] for key,value in self.model.val_scores.items()},
-                                       index = ['Validation'])
-            results = pd.concat([results, val_results], axis = 0)
-            
-        if self.model.test_scores is not None:
-            test_results = pd.DataFrame({key: [value] for key,value in self.model.test_scores.items()},
-                                        index = ['Test'])
-            results = pd.concat([results, test_results], axis = 0)
-
-        return results
-
-    def predict_data(self, dataloaders):
-        
-        prediction_batches = self.predict(model = self.model, 
-                                          dataloaders = dataloaders)
-        
-        predictions = torch.cat(prediction_batches, 0).cpu().numpy().squeeze()
-
-        return predictions
-
+## Pytorch Lightning module for regression networkds
 class LitRegressor(pl.LightningModule):
     def __init__(self,
                  model, 
