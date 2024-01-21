@@ -3,7 +3,7 @@ import pytorch_lightning as pl
 import numpy as np
 import pandas as pd
 
-class CustomTrainer(pl.Trainer):
+class ClassificationTrainer(pl.Trainer):
     def __init__(self, 
                  max_epochs = None):
         
