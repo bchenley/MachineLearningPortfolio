@@ -585,8 +585,8 @@ class LitClassifier(pl.LightningModule):
 
         return output
 
-## Pytorch Lightning module for regression networkds
-class LitRegressor(pl.LightningModule):
+## Pytorch Lightning module for sequence models
+class LitSequence(pl.LightningModule):
     def __init__(self,
                  model, 
                  criterion, optimizer,
@@ -598,7 +598,7 @@ class LitRegressor(pl.LightningModule):
                  track_parameters = False,
                  accelerator = 'cpu', devices = 1):
         
-        super(LitRegressor, self).__init__()
+        super(LitSequence, self).__init__()
         
         # Store the arguments as attributes
         locals_ = locals().copy()
