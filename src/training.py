@@ -3,7 +3,7 @@ import pytorch_lightning as pl
 import numpy as np
 import pandas as pd
 
-class RegressionTrainer(pl.Trainer):
+class CustomRegressionTrainer(pl.Trainer):
     def __init__(self, 
                  max_epochs = None):
         
@@ -108,7 +108,7 @@ class RegressionTrainer(pl.Trainer):
 
         return predictions
         
-class ClassificationTrainer(pl.Trainer):
+class CustomClassificationTrainer(pl.Trainer):
     def __init__(self, 
                  max_epochs = None):
         
