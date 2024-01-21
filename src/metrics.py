@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+
 from sklearn.metrics import accuracy_score, precision_score, recall_score, \
                             f1_score, roc_auc_score, roc_curve, \
                             mean_squared_error, mean_squared_log_error, \
