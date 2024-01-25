@@ -28,7 +28,7 @@ def calculate_scores(y_true, y_pred, scores = None):
 
   return results
 
-def evaluate_classifier(model, X, y, scores = None, model_name = None):
+def evaluate_model(model, X, y, scores = None, model_name = None):
 
   y_pred = model.predict(X)
 
