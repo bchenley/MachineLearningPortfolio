@@ -12,6 +12,15 @@ def root_mean_squared_error(y_true, y_pred):
 
 def root_mean_squared_log_error(y_true, y_pred):
     return root_mean_squared_error(np.log1p(y_true), np.log1p(y_pred))
+
+def adj_r2_score(y_true, y_pred, p, n = None):
+
+    n = n or len(y_true)
+
+    r2 = r2_score(y_true, y_pred)
+    adj_r2 = 1 - (1 - r2) * (n-1) / (n-p-1)
+
+    return adj_r2
   
 def calculate_scores(y_true, y_pred, scores = None):
   
