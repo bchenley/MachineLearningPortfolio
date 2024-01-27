@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np 
 
 from sklearn.feature_selection import chi2, f_classif
 from sklearn.preprocessing import LabelEncoder
