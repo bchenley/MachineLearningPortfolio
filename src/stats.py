@@ -4,7 +4,7 @@ from sklearn.feature_selection import chi2, f_classif
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import QuantileTransformer, StandardScaler
 
-from scipy.stats import skew
+from scipy.stats import skew, entropy
 
 def chi2_test(df, 
               categorical_features, target, 
@@ -65,4 +65,22 @@ def skew_test(df, numeric_features):
   results = pd.DataFrame({'Skew': skew_scores}, index = numeric_features)
 
   return results
+
+def gini_impurity(data):
+
+  if sum(data) == 0:
+    return 0
+
+  proba = [x/sum(data) for x in data]
+  return 1 - sum(p**2 for p in proba)
+
+def impurity_score(data, method = 'entropy'):
+  if method == 'entropy':
+    info = entropy(data, base = 2)
+  elif method == 'gini':
+    info = gini_impurity(data)
+  else:
+        raise ValueError("Method must be either 'entropy' or 'gini'")
+
+  return info
 
