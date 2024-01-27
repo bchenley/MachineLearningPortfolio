@@ -66,21 +66,39 @@ def skew_test(df, numeric_features):
 
   return results
 
-def gini_impurity(data):
+def shannon(data):
+  
+  _, counts = np.unique(data, return_counts = True)
+  proba = counts / counts.sum()
+  
+  return entropy(proba, base = 2)
 
-  if sum(data) == 0:
-    return 0
+def gini(data):
 
-  proba = [x/sum(data) for x in data]
+  _, counts = np.unique(data, return_counts = True)
+  proba = counts / counts.sum()
+
+  proba = [count/sum(counts) for count in counts]
   return 1 - sum(p**2 for p in proba)
 
-def impurity_score(data, method = 'entropy'):
-  if method == 'entropy':
-    info = entropy(data, base = 2)
+def impurity_score(data, method = 'shannon'):
+
+  if method == 'shannon':
+    return shannon(data)
   elif method == 'gini':
-    info = gini_impurity(data)
+    return gini(data)
   else:
-        raise ValueError("Method must be either 'entropy' or 'gini'")
+    raise ValueError(f"method ({method}) must be 'shannon' or 'gini'.")
 
-  return info
+def info_gain(split_feature, target, method = 'shannon'):
 
+  info_before = impurity_score(target, method)
+
+  values, counts = np.unique(split_feature, return_counts = True)
+
+  info_after = 0
+  for value, count in zip(values, counts):
+    subset = target[split_feature == value]
+    info_after += impurity_score(subset, method) * count / len(target)
+
+  return info_before - info_after
