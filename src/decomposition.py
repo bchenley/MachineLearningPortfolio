@@ -2,6 +2,13 @@ from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 
+def eig(data):
+  eval, evec = np.linalg.eig(data)
+
+  sort_idx = eval.argsort()[::-1]
+
+  return eval[sort_idx], evec[:, sort_idx]
+  
 class PrincipalComponentAnalysis():
   def __init__(self,
                n_components=None, copy=True, whiten=False, svd_solver='auto',
