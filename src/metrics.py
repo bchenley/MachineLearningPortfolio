@@ -21,6 +21,18 @@ def adj_r2_score(y_true, y_pred, p, n = None):
     adj_r2 = 1 - (1 - r2) * (n-1) / (n-p-1)
 
     return adj_r2
+
+def euclidean_distance(X, Y):
+    distance = np.sqrt(np.sum((X - Y)**2))
+    return distance
+
+def manhattan_distance(X, Y):
+    distance = np.sum(np.abs(X - Y))
+    return distance
+
+def cosine_similarity(X, Y):
+    similarity = np.dot(X, Y) / (np.norm(X, 2)*np.norm(Y, 2))
+    return similarity
   
 def calculate_scores(y_true, y_pred, scores = None):
   
