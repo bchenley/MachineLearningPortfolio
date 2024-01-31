@@ -34,7 +34,7 @@ def cosine_similarity(X, Y, axis = None):
     similarity = np.dot(X, Y) / (np.linalg.norm(X, 2)*np.linalg.norm(Y, 2))
     return similarity
 
-def silhouette_score_(data, labels, metric = 'euclidean', greater_is_better = False):
+def silhouette_score(data, labels, metric = 'euclidean', greater_is_better = False):
 
   if metric == 'euclidean':
     metric_fn = euclidean_distance
