@@ -31,7 +31,7 @@ def manhattan_distance(X, Y, axis = 1):
     return distance
 
 def cosine_similarity(X, Y):
-    similarity = np.dot(X, Y) / (np.norm(X, 2)*np.norm(Y, 2))
+    similarity = np.dot(X, Y) / (np.linalg.norm(X, 2)*np.linalg.norm(Y, 2))
     return similarity
   
 def calculate_scores(y_true, y_pred, scores = None):
