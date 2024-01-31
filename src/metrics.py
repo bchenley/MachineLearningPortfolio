@@ -67,6 +67,39 @@ def silhouette_score_(data, labels, metric = 'euclidean', greater_is_better = Fa
   score = np.mean(score)
 
   return score
+
+def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
+    
+    if metric == 'euclidean':
+      metric_fn = euclidean_distance
+    elif metric == 'manhattan':
+      metric_fn = manhattan_distance
+    elif metric == 'cosine_similarity':
+      metric_fn = cosine_similarity
+    
+    sign_ = (-1)**(1 + ~greater_is_better)
+    
+    unique_labels = np.unique(labels)
+    
+    max_intra_cluster_distances = []
+    min_inter_cluster_distances = []
+    
+    for i in range(len(unique_labels)):
+      ns_i = np.where(labels == unique_labels[i])[0]      
+      max_intra_cluster_distances.append(np.max([np.max(sign_ * metric_fn(data[n], data[ns_i], axis = 1)) 
+                                                 for n in ns_i]))
+      
+      for j in range(i+1, len(unique_labels)):
+        ns_j = np.where(labels == unique_labels[j])[0] 
+        min_inter_cluster_distances.append(np.min([np.min(sign_ * metric_fn(data[n], data[ns_j], axis = 1)) 
+                                                   for n in ns_i]))
+
+    max_intra_cluster_distance = np.max(max_intra_cluster_distances)
+    min_inter_cluster_distance = np.min(min_inter_cluster_distances)
+    
+    score = min_inter_cluster_distance / max_intra_cluster_distance
+
+    return score
   
 def calculate_scores(y_true, y_pred, scores = None):
   
