@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
+
 from sklearn.cluster import kmeans_plusplus
+
+from src import euclidean_distance, manhattan_distance, cosine_similarity
 
 class CustomKMeans():
     def __init__(self, 
