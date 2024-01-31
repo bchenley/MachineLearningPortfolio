@@ -100,7 +100,17 @@ def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
     score = min_inter_cluster_distance / max_intra_cluster_distance
 
     return score
+
+def within_cluster_sum_of_squares(self, data, labels):
+    
+  unique_labels = np.unique(labels)
   
+  wcss = 0
+  for i in range(len(unique_labels)):
+      wcss += np.abs((data[labels == unique_labels[i], :] - data[labels == unique_labels[i], :].mean(axis = 0))**2).sum()
+
+  return wcss
+      
 def calculate_scores(y_true, y_pred, scores = None):
   
   if scores is None:
