@@ -1,5 +1,7 @@
 pandas
 numpy
+sklearn 
+scikit-learn-extra
 torch
 pytorch_lightning
 torchvision
