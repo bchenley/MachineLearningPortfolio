@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+import numpy as 
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, \
                             f1_score, roc_auc_score, roc_curve, \
@@ -22,12 +22,12 @@ def adj_r2_score(y_true, y_pred, p, n = None):
 
     return adj_r2
 
-def euclidean_distance(X, Y):
-    distance = np.sqrt(np.sum((X - Y)**2))
+def euclidean_distance(X, Y, axis = 1):
+    distance = np.sqrt(np.sum((X - Y)**2, axis = axis))
     return distance
 
-def manhattan_distance(X, Y):
-    distance = np.sum(np.abs(X - Y))
+def manhattan_distance(X, Y, axis = 1):
+    distance = np.sum(np.abs(X - Y), axis = axis)
     return distance
 
 def cosine_similarity(X, Y):
