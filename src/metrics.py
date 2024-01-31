@@ -33,6 +33,40 @@ def manhattan_distance(X, Y, axis = 1):
 def cosine_similarity(X, Y):
     similarity = np.dot(X, Y) / (np.linalg.norm(X, 2)*np.linalg.norm(Y, 2))
     return similarity
+
+def silhouette_score_(data, labels, metric = 'euclidean', greater_is_better = False):
+
+  if metric == 'euclidean':
+    metric_fn = euclidean_distance
+  elif metric == 'manhattan':
+    metric_fn = manhattan_distance
+  elif metric == 'cosine_similarity':
+    metric_fn = cosine_similarity
+  
+  sign_ = (-1)**(1 + ~greater_is_better)
+
+  unique_labels = np.unique(labels)
+  idx = np.arange(data.shape[0])
+
+  a = []
+  b = []
+  score = []
+  for n in range(data.shape[0]):
+    a.append((sign_ * metric_fn(data[(labels == labels[n]) & (idx != n), :], data[n, :])).mean())
+    b.append(np.min([(sign_ * metric_fn(data[labels == label, :], data[n, :])).mean() for label in unique_labels if label != labels[n]]))
+
+    if (b[-1] == 0) & (a[-1] == 0):
+      score.append(0)
+    elif (b[-1] == 0) & (a[-1] != 0):
+      score.append(-1)
+    elif (b[-1] != 0) & (a[-1] == 0):
+      score.append(1)
+    else:
+      score.append((b[-1] - a[-1]) / np.max([a[-1], b[-1]]))
+
+  score = np.mean(score)
+
+  return score
   
 def calculate_scores(y_true, y_pred, scores = None):
   
