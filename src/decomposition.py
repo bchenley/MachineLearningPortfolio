@@ -11,16 +11,18 @@ def eig(data):
   
 class PrincipalComponentAnalysis():
   def __init__(self,
-               n_components=None, copy=True, whiten=False, svd_solver='auto',
+               n_components = None, copy=True, whiten=False, svd_solver='auto',
                tol=0.0, iterated_power='auto', n_oversamples=10, power_iteration_normalizer='auto',
                random_state=None):
 
+    self.n_components = n_components
+    
     self.pca = PCA(n_components = n_components,
                    copy = copy, whiten = whiten, svd_solver = svd_solver,
                    tol = tol, iterated_power = iterated_power, n_oversamples = n_oversamples,
                    power_iteration_normalizer = power_iteration_normalizer, random_state = random_state)
     
-  def fit(self, data, kaiser = False, threshold = 1.):
+  def fit(self, data, kaiser = False, sval_threshold = 1.0, var_threshold = 1.0, digits = 4):
 
     # Fit
     self.pca.fit(data)
@@ -34,33 +36,50 @@ class PrincipalComponentAnalysis():
     # Compute percent cumalative contribution
     sval_pct_cumsum = sval.cumsum()/sval.sum()
 
-    # Apply sval threshold
-    thresh_mask = sval_pct_cumsum <= threshold
-    pc = pc[thresh_mask, :]
-    sval = sval[thresh_mask]
-    eval_cov = eval_cov[thresh_mask]
-    sval_pct_cumsum = sval_pct_cumsum[thresh_mask]
+    # Compute percent cumaltive variance explained 
+    var_pct_cumsum = self.pca.explained_variance_ratio_.cumsum()/self.pca.explained_variance_ratio_.sum()
+
+    # Apply sval_threshold
+    
+    sval_mask = np.round(sval_pct_cumsum, digits) <= np.round(sval_threshold, digits)
+
+    pc = pc[sval_mask, :]
+    sval = sval[sval_mask]
+    eval_cov = eval_cov[sval_mask]
+    sval_pct_cumsum = sval_pct_cumsum[sval_mask]
+    var_pct_cumsum = var_pct_cumsum[sval_mask]
 
     # Apply kaiser
     if kaiser:
-      kaiser_mask = eval_cov >= 1.
+      kaiser_mask = np.round(eval_cov,digits) >= 1.
       pc = pc[kaiser_mask, :]
       sval = sval[kaiser_mask]
       eval_cov = eval_cov[kaiser_mask]
       sval_pct_cumsum = sval_pct_cumsum[kaiser_mask]
+      var_pct_cumsum = var_pct_cumsum[kaiser_mask]
+
+    # If n_components is a float    
+    var_mask = np.round(var_pct_cumsum, digits) <= np.round(var_threshold, digits)
+    
+    pc = pc[var_mask, :]
+    sval = sval[var_mask]
+    eval_cov = eval_cov[var_mask]
+    sval_pct_cumsum = sval_pct_cumsum[var_mask]
+    var_pct_cumsum = var_pct_cumsum[var_mask]
 
     self.pc, self.sval, self.eval_cov = pc, sval, eval_cov
     self.sval_pct_cumsum = sval_pct_cumsum
+    self.var_pct_cumsum = var_pct_cumsum
 
     self.n_components = len(self.sval)
-
+    
   def transform(self, data):
 
     return data.dot(self.pc.T)
 
-  def fit_transform(self, data, kaiser = False, threshold = 1.):
+  def fit_transform(self, data, kaiser = False, sval_threshold = 1.0, var_threshold = 1.0):
 
-    self.fit(data, kaiser = kaiser, threshold = threshold)
+    self.fit(data, kaiser = kaiser, sval_threshold = sval_threshold, var_threshold = var_threshold)
 
     return self.transform(data)
 
@@ -85,7 +104,7 @@ class PrincipalComponentAnalysis():
     ax[1].set_xticklabels(np.arange(1, self.n_components+1))
     ax[1].set_xlabel('Principal Component')
 
-    ax[2].stem(np.cumsum(self.pca.explained_variance_ratio_)*100, basefmt = " ")
+    ax[2].stem(self.var_pct_cumsum*100, basefmt = " ")
     ax[2].yaxis.grid(True)
     ax[2].set_ylim([0, 101])
     ax[2].set_yticks(np.arange(0, 110, 10))
