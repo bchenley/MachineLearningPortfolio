@@ -3,8 +3,9 @@ import numpy as np
 
 from sklearn.cluster import kmeans_plusplus
 
-from metrics import euclidean_distance, within_cluster_sum_of_squares, \
-                    manhattan_distance, cosine_similarity
+from metrics import euclidean_distance, within_cluster_sum_of_squares, \                    
+                    manhattan_distance, cosine_similarity, \
+                    dunn_score, silhouette_score
 
 class CustomKMeans():
     def __init__(self,
@@ -35,9 +36,9 @@ class CustomKMeans():
 
     def assign_clusters(self, data):
 
-        distances = []
+        distances = [] 
         for n in range(self.n_clusters):
-            distances.append((-1)**(1 + ~self.greater_is_better) * self.distance_fn(data, self.cluster_centers_[n]))
+            distances.append((-1)**(1 + ~self.greater_is_better) * self.distance_fn(data, self.cluster_centers_[n], axis = 1))
 
         distances = np.stack(distances, axis = 1)
         
@@ -49,13 +50,13 @@ class CustomKMeans():
 
         cluster_centers = []
         for n in range(self.n_clusters):
-            if np.any(self.labels_ == self.labels_[n]):
-                cluster_centers.append(data[self.labels_ == self.labels_[n], :].mean(axis = 0))
-            else:
+            if np.any(self.labels_ == n):
+                cluster_centers.append(data[self.labels_ == n, :].mean(axis = 0))
+            else:                
                 cluster_centers.append(data[:, ((-1)**(1 + ~self.greater_is_better)*self.distance_fn(data, self.cluster_centers_[n])).argmax()])
 
         cluster_centers = np.stack(cluster_centers, axis = 0)
-
+        
         return cluster_centers
 
     def fit(self, data):
@@ -75,15 +76,15 @@ class CustomKMeans():
         new_labels_ = self.assign_clusters(data)
 
         itr = 0
-        while (any(self.labels_ != new_labels_) and (itr <= self.max_iter)):
+        while (any(self.labels_ != new_labels_) and (itr <= self.max_iter)):            
             self.labels_ = new_labels_
             self.cluster_centers_ = self.update_cluster_centers(data)
             new_labels_ = self.assign_clusters(data)            
             itr += 1
-            
+        
         self.inertia_ = within_cluster_sum_of_squares(data, self.labels_, self.distance)
-        # self.dunn_ = dunn_score(data, self.labels_, self.distance)
-        # self.silhouette_ = silhouette_score(data, self.labels_, self.distance)
+        self.dunn_ = dunn_score(data, self.labels_, self.distance)
+        self.silhouette_ = silhouette_score(data, self.labels_, self.distance)
     
     def predict(self, data):
       return self.assign_clusters(data)
