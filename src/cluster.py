@@ -7,21 +7,37 @@ from metrics import (euclidean_distance, within_cluster_sum_of_squares,
                      manhattan_distance, cosine_similarity,
                      dunn_score, silhouette_score)
 
-class CustomKMeans():
+class CustomKMeans(KMeans):
     def __init__(self,
                  n_clusters = 2,
                  init = 'k-means++',
                  max_iter = 100,
+                 metric = 'wcss',
                  distance = 'euclidean',
                  random_state = None):
+
+        super().__init__(n_clusters = n_clusters,
+                         init = init,
+                         max_iter = max_iter,
+                         random_state = random_state)
 
         self.n_clusters = n_clusters
         self.init = init
         self.max_iter = max_iter
+        self.metric = metric
         self.distance = distance
         self.random_state = random_state
 
         self.greater_is_better = False
+
+        self.metric_fn = None 
+        if self.metric == 'wcss':
+          self.metric_fn = within_cluster_sum_of_squares
+        elif self.metric == 'silhouette':
+          self.metric_fn = silhouette_score
+        elif self.metric == 'dunn':
+          self.metric_fn = dunn_score
+
         self.distance_fn = None
         if self.distance == 'euclidean':
             self.distance_fn = euclidean_distance
@@ -60,7 +76,7 @@ class CustomKMeans():
         return cluster_centers
 
     def fit(self, data):
-
+              
         self.n_samples = data.shape[0]
 
         np.random.seed(self.random_state)
@@ -100,15 +116,19 @@ class CustomKMeans():
       return {'n_clusters': self.n_clusters,
               'init': self.init,
               'max_iter': self.max_iter,
-              'distance': self.distance,
+              'metric': self.metric,
+              'distance': self.distance,              
               'random_state': self.random_state}
 
-    def set_params(self, params):
+    def set_params(self, **cloned_parameters):
       
-      for param, value in params.items():
+      for param, value in cloned_parameters.items():
         setattr(self, param, value)
       
       return self
+
+    def score(self, data, labels = None, sample_weight = None):
+      return -self.metric_fn(data, labels, self.distance, self.greater_is_better)
 
     def elbow_test(self,
                    train_data, val_data = None,
