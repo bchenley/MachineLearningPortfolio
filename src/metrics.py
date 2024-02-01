@@ -96,7 +96,7 @@ def dunn_score(data, labels, distance = 'euclidean', greater_is_better = False):
 
     max_intra_cluster_distance = np.max(max_intra_cluster_distances)
     min_inter_cluster_distance = np.min(min_inter_cluster_distances)
-    
+     
     score = min_inter_cluster_distance / max_intra_cluster_distance
 
     return score
