@@ -101,7 +101,7 @@ def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
 
     return score
 
-def within_cluster_sum_of_squares(self, data, labels):
+def within_cluster_sum_of_squares(self, data, labels, metric = None):
     
   unique_labels = np.unique(labels)
   
