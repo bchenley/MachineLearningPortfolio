@@ -110,7 +110,20 @@ def within_cluster_sum_of_squares(self, data, labels, metric = None):
       wcss += np.abs((data[labels == unique_labels[i], :] - data[labels == unique_labels[i], :].mean(axis = 0))**2).sum()
 
   return wcss
-      
+
+def calculate_cluster_scores(data, labels, metric = 'euclidean', scores = None):
+  
+  if scores is None:
+    scores = {'inertia': within_cluster_sum_of_squares,
+              'silhouette': silhouette_score,
+              'dunn': dunn_score}
+  
+  results = {}
+  for name, func in scores.items():
+      results[name] = func(data, labels, metric = metric)
+
+  return results
+  
 def calculate_scores(y_true, y_pred, scores = None):
   
   if scores is None:
