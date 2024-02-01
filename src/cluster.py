@@ -81,3 +81,9 @@ class CustomKMeans():
 
     def predict(self, data):
       return self.assign_clusters(data)
+
+    def fit_predict(self, data):
+
+      self.fit(data)
+
+      return self.predict(data)
