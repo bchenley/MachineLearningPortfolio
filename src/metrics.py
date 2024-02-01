@@ -52,8 +52,8 @@ def silhouette_score(data, labels, distance = 'euclidean', greater_is_better = F
   b = []
   score = []
   for n in range(data.shape[0]):
-    a.append((sign_ * distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n, :])).mean())
-    b.append(np.min([(sign_ * distance_fn(data[labels == label, :], data[n, :])).mean() for label in unique_labels if label != labels[n]]))
+    a.append((sign_ * distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n:(n+1), :])).mean())
+    b.append(np.min([(sign_ * distance_fn(data[labels == label, :], data[n:(n+1), :])).mean() for label in unique_labels if label != labels[n]]))
 
     if (b[-1] == 0) & (a[-1] == 0):
       score.append(0)
@@ -86,12 +86,12 @@ def dunn_score(data, labels, distance = 'euclidean', greater_is_better = False):
     
     for i in range(len(unique_labels)):
       ns_i = np.where(labels == unique_labels[i])[0]      
-      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n, :], data[ns_i, :], axis = 1)) 
+      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n:(n+1), :], data[ns_i, :], axis = 1)) 
                                                  for n in ns_i]))
       
       for j in range(i+1, len(unique_labels)):
         ns_j = np.where(labels == unique_labels[j])[0] 
-        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n, :], data[ns_j, :], axis = 1)) 
+        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n:(n+1), :], data[ns_j, :], axis = 1)) 
                                                    for n in ns_i]))
 
     max_intra_cluster_distance = np.max(max_intra_cluster_distances)
