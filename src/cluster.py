@@ -83,8 +83,8 @@ class CustomKMeans():
             itr += 1
         
         self.inertia_ = within_cluster_sum_of_squares(data, self.labels_, self.distance)
-        self.dunn_ = dunn_score(data, self.labels_, self.distance)
-        self.silhouette_ = silhouette_score(data, self.labels_, self.distance)
+        self.dunn_ = dunn_score(data, self.labels_, self.distance, self.greater_is_better)
+        self.silhouette_ = silhouette_score(data, self.labels_, self.distance, self.greater_is_better)
     
     def predict(self, data):
       return self.assign_clusters(data)
