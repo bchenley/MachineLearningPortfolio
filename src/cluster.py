@@ -39,9 +39,9 @@ class CustomKMeans():
             distances.append((-1)**(1 + ~self.greater_is_better) * self.distance_fn(data, self.cluster_centers_[n]))
 
         distances = np.stack(distances, axis = 1)
-
+        
         labels_ = distances.argmin(axis = 1)
-
+        
         return labels_
 
     def update_cluster_centers(self, data):
@@ -77,8 +77,12 @@ class CustomKMeans():
         while (any(self.labels_ != new_labels_) and (itr <= self.max_iter)):
             self.labels_ = new_labels_
             self.cluster_centers_ = self.update_cluster_centers(data)
-            new_labels_ = self.assign_clusters(data)
+            new_labels_ = self.assign_clusters(data)            
             itr += 1
+            
+        self.inertia_ = within_cluster_sum_of_squares(data, self.labels_, self.distance)
+        # self.dunn_ = dunn_score(data, self.labels_, self.distance)
+        # self.silhouette_ = silhouette_score(data, self.labels_, self.distance)
     
     def predict(self, data):
       return self.assign_clusters(data)
@@ -129,7 +133,7 @@ class CustomKMeans():
 
           labels = self.predict(val_data)
 
-          scores_ = calculate_cluster_scores(data = val_data, labels = labels, distance = distance)
+          scores_ = calculate_cluster_scores(data = val_data, labels = labels, distance = distance) 
 
           results['n_clusters'].append(n_clusters)
           results['distance'].append(distance)
