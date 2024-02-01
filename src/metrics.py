@@ -23,7 +23,7 @@ def adj_r2_score(y_true, y_pred, p, n = None):
     return adj_r2
 
 def euclidean_distance(X, Y, axis = 1):
-    distance = np.sqrt(np.sum((X - Y)**2, axis = axis))
+    distance = np.sqrt(np.sum(np.abs(X - Y)**2, axis = axis))
     return distance
 
 def manhattan_distance(X, Y, axis = 1):
@@ -107,7 +107,10 @@ def within_cluster_sum_of_squares(data, labels, distance = None):
   
   wcss = 0
   for i in range(len(unique_labels)):
-      wcss += np.abs((data[labels == unique_labels[i], :] - data[labels == unique_labels[i], :].mean(axis = 0))**2).sum()
+      
+      wcss += np.sum(euclidean_distance(data[np.where(labels == unique_labels[i])[0], :], 
+                                 data[np.where(labels == unique_labels[i])[0], :].mean(axis = 0),
+                                 axis = 1)**2)
 
   return wcss
 
