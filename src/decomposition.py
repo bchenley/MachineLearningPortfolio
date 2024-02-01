@@ -19,7 +19,7 @@ class PrincipalComponentAnalysis():
                    copy = copy, whiten = whiten, svd_solver = svd_solver,
                    tol = tol, iterated_power = iterated_power, n_oversamples = n_oversamples,
                    power_iteration_normalizer = power_iteration_normalizer, random_state = random_state)
-
+    
   def fit(self, data, kaiser = False, threshold = 1.):
 
     # Fit
@@ -32,14 +32,14 @@ class PrincipalComponentAnalysis():
     eval_cov = (sval**2)/(data.shape[0]-1)
 
     # Compute percent cumalative contribution
-    pct_cumsum = sval.cumsum()/sval.sum()
+    sval_pct_cumsum = sval.cumsum()/sval.sum()
 
-    # Apply threshold
-    thresh_mask = pct_cumsum <= threshold
+    # Apply sval threshold
+    thresh_mask = sval_pct_cumsum <= threshold
     pc = pc[thresh_mask, :]
     sval = sval[thresh_mask]
     eval_cov = eval_cov[thresh_mask]
-    pct_cumsum = pct_cumsum[thresh_mask]
+    sval_pct_cumsum = sval_pct_cumsum[thresh_mask]
 
     # Apply kaiser
     if kaiser:
@@ -47,10 +47,10 @@ class PrincipalComponentAnalysis():
       pc = pc[kaiser_mask, :]
       sval = sval[kaiser_mask]
       eval_cov = eval_cov[kaiser_mask]
-      pct_cumsum = pct_cumsum[kaiser_mask]
+      sval_pct_cumsum = sval_pct_cumsum[kaiser_mask]
 
     self.pc, self.sval, self.eval_cov = pc, sval, eval_cov
-    self.pct_cumsum = pct_cumsum
+    self.sval_pct_cumsum = sval_pct_cumsum
 
     self.n_components = len(self.sval)
 
@@ -67,7 +67,7 @@ class PrincipalComponentAnalysis():
   def plot(self, ax = None):
 
     if ax is None:
-      fig, ax = plt.subplots(1, 2, figsize = (10, 5))
+      fig, ax = plt.subplots(1, 3, figsize = (15, 5))
 
     ax[0].stem(self.eval_cov, basefmt = " ")
     ax[0].yaxis.grid(True)
@@ -76,11 +76,20 @@ class PrincipalComponentAnalysis():
     ax[0].set_xticklabels(np.arange(1, self.n_components+1))
     ax[0].set_xlabel('Eigen Value Order')
   
-    ax[1].stem(self.pct_cumsum, basefmt = " ")
+    ax[1].stem(self.sval_pct_cumsum*100, basefmt = " ")
     ax[1].yaxis.grid(True)
-    ax[1].set_ylim([0, 1.01])
-    ax[1].set_yticks(np.arange(0, 1.05, .1))
+    ax[1].set_ylim([0, 101])
+    ax[1].set_yticks(np.arange(0, 110, 10))
     ax[1].set_ylabel('% Cumalative Contribution of Singular Values')  
     ax[1].set_xticks(np.arange(0, self.n_components))
     ax[1].set_xticklabels(np.arange(1, self.n_components+1))
     ax[1].set_xlabel('Principal Component')
+
+    ax[2].stem(np.cumsum(self.pca.explained_variance_ratio_)*100, basefmt = " ")
+    ax[2].yaxis.grid(True)
+    ax[2].set_ylim([0, 101])
+    ax[2].set_yticks(np.arange(0, 110, 10))
+    ax[2].set_ylabel('% Cumalative Variance Explained')  
+    ax[2].set_xticks(np.arange(0, self.n_components))
+    ax[2].set_xticklabels(np.arange(1, self.n_components+1))
+    ax[2].set_xlabel('Principal Component')
