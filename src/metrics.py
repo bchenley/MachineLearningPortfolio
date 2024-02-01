@@ -34,14 +34,14 @@ def cosine_similarity(X, Y, axis = None):
     similarity = np.dot(X, Y) / (np.linalg.norm(X, 2)*np.linalg.norm(Y, 2))
     return similarity
 
-def silhouette_score(data, labels, metric = 'euclidean', greater_is_better = False):
+def silhouette_score(data, labels, distance = 'euclidean', greater_is_better = False):
 
-  if metric == 'euclidean':
-    metric_fn = euclidean_distance
-  elif metric == 'manhattan':
-    metric_fn = manhattan_distance
-  elif metric == 'cosine_similarity':
-    metric_fn = cosine_similarity
+  if distance == 'euclidean':
+    distance_fn = euclidean_distance
+  elif distance == 'manhattan':
+    distance_fn = manhattan_distance
+  elif distance == 'cosine_similarity':
+    distance_fn = cosine_similarity
   
   sign_ = (-1)**(1 + ~greater_is_better)
 
@@ -52,8 +52,8 @@ def silhouette_score(data, labels, metric = 'euclidean', greater_is_better = Fal
   b = []
   score = []
   for n in range(data.shape[0]):
-    a.append((sign_ * metric_fn(data[(labels == labels[n]) & (idx != n), :], data[n, :])).mean())
-    b.append(np.min([(sign_ * metric_fn(data[labels == label, :], data[n, :])).mean() for label in unique_labels if label != labels[n]]))
+    a.append((sign_ * distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n, :])).mean())
+    b.append(np.min([(sign_ * distance_fn(data[labels == label, :], data[n, :])).mean() for label in unique_labels if label != labels[n]]))
 
     if (b[-1] == 0) & (a[-1] == 0):
       score.append(0)
@@ -68,14 +68,14 @@ def silhouette_score(data, labels, metric = 'euclidean', greater_is_better = Fal
 
   return score
 
-def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
+def dunn_score(data, labels, distance = 'euclidean', greater_is_better = False):
     
-    if metric == 'euclidean':
-      metric_fn = euclidean_distance
-    elif metric == 'manhattan':
-      metric_fn = manhattan_distance
-    elif metric == 'cosine_similarity':
-      metric_fn = cosine_similarity
+    if distance == 'euclidean':
+      distance_fn = euclidean_distance
+    elif distance == 'manhattan':
+      distance_fn = manhattan_distance
+    elif distance == 'cosine_similarity':
+      distance_fn = cosine_similarity
     
     sign_ = (-1)**(1 + ~greater_is_better)
     
@@ -86,12 +86,12 @@ def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
     
     for i in range(len(unique_labels)):
       ns_i = np.where(labels == unique_labels[i])[0]      
-      max_intra_cluster_distances.append(np.max([np.max(sign_ * metric_fn(data[n], data[ns_i], axis = 1)) 
+      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n], data[ns_i], axis = 1)) 
                                                  for n in ns_i]))
       
       for j in range(i+1, len(unique_labels)):
         ns_j = np.where(labels == unique_labels[j])[0] 
-        min_inter_cluster_distances.append(np.min([np.min(sign_ * metric_fn(data[n], data[ns_j], axis = 1)) 
+        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n], data[ns_j], axis = 1)) 
                                                    for n in ns_i]))
 
     max_intra_cluster_distance = np.max(max_intra_cluster_distances)
@@ -101,7 +101,7 @@ def dunn_score(data, labels, metric = 'euclidean', greater_is_better = False):
 
     return score
 
-def within_cluster_sum_of_squares(self, data, labels, metric = None):
+def within_cluster_sum_of_squares(self, data, labels, distance = None):
     
   unique_labels = np.unique(labels)
   
@@ -111,7 +111,7 @@ def within_cluster_sum_of_squares(self, data, labels, metric = None):
 
   return wcss
 
-def calculate_cluster_scores(data, labels, metric = 'euclidean', scores = None):
+def calculate_cluster_scores(data, labels, distance = 'euclidean', scores = None):
   
   if scores is None:
     scores = {'inertia': within_cluster_sum_of_squares,
@@ -120,7 +120,7 @@ def calculate_cluster_scores(data, labels, metric = 'euclidean', scores = None):
   
   results = {}
   for name, func in scores.items():
-      results[name] = func(data, labels, metric = metric)
+      results[name] = func(data, labels, distance = distance)
 
   return results
   
