@@ -86,12 +86,12 @@ def dunn_score(data, labels, distance = 'euclidean', greater_is_better = False):
     
     for i in range(len(unique_labels)):
       ns_i = np.where(labels == unique_labels[i])[0]      
-      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n], data[ns_i], axis = 1)) 
+      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n, :], data[ns_i, :], axis = 1)) 
                                                  for n in ns_i]))
       
       for j in range(i+1, len(unique_labels)):
         ns_j = np.where(labels == unique_labels[j])[0] 
-        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n], data[ns_j], axis = 1)) 
+        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n, :], data[ns_j, :], axis = 1)) 
                                                    for n in ns_i]))
 
     max_intra_cluster_distance = np.max(max_intra_cluster_distances)
