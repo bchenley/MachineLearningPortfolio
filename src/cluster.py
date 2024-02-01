@@ -3,7 +3,8 @@ import numpy as np
 
 from sklearn.cluster import kmeans_plusplus
 
-from metrics import euclidean_distance, manhattan_distance, cosine_similarity
+from metrics import euclidean_distance, within_cluster_sum_of_squares, \
+                    manhattan_distance, cosine_similarity
 
 class CustomKMeans():
     def __init__(self,
