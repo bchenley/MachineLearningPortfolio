@@ -120,7 +120,7 @@ def calculate_cluster_scores(data, labels, distance = 'euclidean', scores = None
   
   results = {}
   for name, func in scores.items():
-      results[name] = func(data, labels, distance = distance)
+      results[name] = func(data = data, labels = labels, distance = distance)
 
   return results
   
