@@ -11,7 +11,7 @@ def describe(df, missing_values = []):
   skew_fn = lambda x: stats.skew(x) if pd.api.types.is_numeric_dtype(x) else np.nan
 
   df_ = pd.concat([df_mode, df.apply(skew_fn) , df.dtypes, df.nunique()], axis = 1)
-  df_.columns = ['Mode', 'Skew', 'Dtype', 'Cardinality']
+  df_.columns = ['mode', 'dkew', 'ftype', 'cardinality']
   
   df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
 
