@@ -15,14 +15,14 @@ def describe(df, missing_values = []):
   
   df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
 
-  df_.drop(columns = ['unique', 'top'], inplace = True)
-
   missing_values = missing_values
   df_['missing'] = 0
   for var in df_.index:
     df_.loc[df_.index == var, 'missing'] = (pd.isna(df[var]) | df[var].map(lambda x: x in missing_values)).sum()
-  
-  df_['count'] = df.count()
+
+  df_['count'] = df_['count'].astype(int)
+  df_['missing'] = df_['missing'].astype(int)
+  df_['cardinality'] = df_['cardinality'].astype(int)
 
   return df_
     
