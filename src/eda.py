@@ -15,6 +15,8 @@ def describe(df, missing_values = []):
   
   df_ = pd.merge(df.describe().T, df_, how = 'right', left_index = True, right_index = True)
 
+  df_.drop(columns = ['unique', 'top'], inplace = True)
+
   missing_values = missing_values
   df_['missing'] = 0
   for var in df_.index:
