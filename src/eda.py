@@ -24,7 +24,9 @@ def describe(df, missing_values = []):
 
   return df_
     
-def annotate_bar(ax, show_height = True, show_percent = False, decimals = 2):
+def annotate_bar(ax, 
+                 show_height = True, show_percent = False, 
+                 decimals = 2, fontsize = 12):
     """
     Display the count and optional percentage on top of each bar in a bar plot.
 
@@ -53,7 +55,7 @@ def annotate_bar(ax, show_height = True, show_percent = False, decimals = 2):
           note = percent
 
         # Add the annotation to the bar at the specified coordinates
-        ax.annotate(note, (x, y), ha='center', va='bottom')
+        ax.annotate(note, (x, y), ha='center', va='bottom', fontsize = fontsize)
 
 class Descriptor:
   """
