@@ -30,9 +30,21 @@ def manhattan_distance(X, Y, axis = 1):
     distance = np.sum(np.abs(X - Y), axis = axis)
     return distance
 
-def cosine_similarity(X, Y, axis = None):    
-    similarity = np.dot(X, Y.T) / (np.linalg.norm(X, 2)*np.linalg.norm(Y, 2))
+def cosine_similarity(X, Y, axis = 1):    
+    X_norm = np.linalg.norm(X, axis = axis, keepdims = True)
+    Y_norm = np.linalg.norm(Y, axis = axis, keepdims = True)
+
+    if X.ndim == 1 or Y.ndim == 1:
+      XY_dot = np.dot(X, Y.T)
+    else:
+      XY_dot = np.dot(X, Y.T) if axis == 1 else np.dot(X.T, Y)
+      
+    similarity = XY_dot/(X_norm * Y_norm.T)    
     return similarity
+
+def cosine_dissimilarity(X, Y, axis = 1):    
+    
+    return 1 - cosine_similarity(X, Y, axis = axis)
 
 def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = False):
 
