@@ -13,7 +13,9 @@ def describe(df, missing_values = []):
   df_ = pd.concat([df_mode, df.apply(skew_fn) , df.dtypes, df.nunique()], axis = 1)
   df_.columns = ['mode', 'skew', 'dtype', 'cardinality']
 
-  df_ = pd.merge(df.describe().T.drop(columns = ['unique', 'top', 'freq']), df_, how = 'right', left_index = True, right_index = True)
+  dfd_T = df.describe().T[['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']]
+  
+  df_ = pd.merge(dfd_T, df_, how = 'right', left_index = True, right_index = True)
 
   missing_values = missing_values
   df_['missing'] = 0
