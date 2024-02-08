@@ -52,8 +52,8 @@ def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = 
     distance_fn = euclidean_distance
   elif distance == 'manhattan':
     distance_fn = manhattan_distance
-  elif distance == 'cosine_similarity':
-    distance_fn = cosine_similarity
+  elif distance == 'cosine_dissimilarity':
+    distance_fn = cosine_dissimilarity
   
   sign_ = (-1)**(1 + ~greater_is_better)
 
