@@ -118,7 +118,7 @@ def calculate_cluster_scores(data, labels, distance = 'euclidean', scores = None
   
   if scores is None:
     scores = {'inertia': within_cluster_sum_of_squares,
-              'silhouette': silhouette_score,
+              'silhouette': silhouette_score_,
               'dunn': dunn_score}
   
   results = {}
