@@ -101,7 +101,7 @@ def dunn_score(data, labels, distance='euclidean', greater_is_better=False):
         if cluster_indices.size > 1:  # Ensure cluster has more than one member
             intra_distances = distance_fn(data[cluster_indices, :], data[cluster_indices, :][:, None], axis=2).max()
             max_intra_cluster_distances.append(intra_distances)
-    
+     
     # Calculate the minimum inter-cluster distance
     for i in range(len(unique_labels)):
         for j in range(i+1, len(unique_labels)): 
