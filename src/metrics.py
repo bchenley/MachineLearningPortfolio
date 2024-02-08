@@ -81,38 +81,44 @@ def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = 
 
   return score
 
-def dunn_score(data, labels, distance = 'euclidean', greater_is_better = False):
-    
-    if distance == 'euclidean':
-      distance_fn = euclidean_distance
-    elif distance == 'manhattan':
-      distance_fn = manhattan_distance
-    elif distance == 'cosine_similarity':
-      distance_fn = cosine_similarity
-    
-    sign_ = (-1)**(1 + ~greater_is_better)
+def dunn_score(data, labels, distance='euclidean', greater_is_better=False):
+    # Mapping the distance function based on the specified metric
+    distance_fn = {
+        'euclidean': euclidean_distance,
+        'manhattan': manhattan_distance,
+        'cosine_dissimilarity': cosine_dissimilarity
+    }.get(distance, euclidean_distance)  # Default to euclidean_distance if not matched
     
     unique_labels = np.unique(labels)
     
     max_intra_cluster_distances = []
     min_inter_cluster_distances = []
     
+    # Calculate the maximum intra-cluster distance
+    for label in unique_labels:
+        cluster_indices = np.where(labels == label)[0]
+        if cluster_indices.size > 1:  # Ensure cluster has more than one member
+            intra_distances = distance_fn(data[cluster_indices, :], data[cluster_indices, :][:, None], axis=2).max()
+            max_intra_cluster_distances.append(intra_distances)
+    
+    # Calculate the minimum inter-cluster distance
     for i in range(len(unique_labels)):
-      ns_i = np.where(labels == unique_labels[i])[0]      
-      max_intra_cluster_distances.append(np.max([np.max(sign_ * distance_fn(data[n:(n+1), :], data[ns_i, :], axis = 1)) 
-                                                 for n in ns_i]))
-      
-      for j in range(i+1, len(unique_labels)):
-        ns_j = np.where(labels == unique_labels[j])[0] 
-        min_inter_cluster_distances.append(np.min([np.min(sign_ * distance_fn(data[n:(n+1), :], data[ns_j, :], axis = 1)) 
-                                                   for n in ns_i]))
- 
-    max_intra_cluster_distance = np.max(max_intra_cluster_distances)
-    min_inter_cluster_distance = np.min(min_inter_cluster_distances)
-     
-    score = min_inter_cluster_distance / max_intra_cluster_distance
-
+        for j in range(i+1, len(unique_labels)): 
+          indices_i = np.where(labels == unique_labels[i])[0]
+          indices_j = np.where(labels == unique_labels[j])[0]
+          inter_distances = distance_fn(data[indices_i, :], data[indices_j, :][:, None], axis=2).min()
+          min_inter_cluster_distances.append(inter_distances)
+    
+    if not max_intra_cluster_distances or not min_inter_cluster_distances:
+        return 0  # Return 0 if unable to calculate due to clustering issues
+    
+    max_intra_cluster_distance = max(max_intra_cluster_distances)
+    min_inter_cluster_distance = min(min_inter_cluster_distances)
+    
+    score = min_inter_cluster_distance / max_intra_cluster_distance if max_intra_cluster_distance > 0 else 0
+    
     return score
+
 
 def within_cluster_sum_of_squares(data, labels, distance = None):
     
