@@ -54,8 +54,6 @@ def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = 
     distance_fn = manhattan_distance
   elif distance == 'cosine_dissimilarity':
     distance_fn = cosine_dissimilarity
-  
-  sign_ = (-1)**(1 + ~greater_is_better)
 
   unique_labels = np.unique(labels)
   idx = np.arange(data.shape[0])
@@ -64,19 +62,22 @@ def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = 
   b = []
   score = []
   for n in range(data.shape[0]):
-    a.append((sign_ * distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n:(n+1), :])).mean())
-    b.append(np.min([(sign_ * distance_fn(data[labels == label, :], data[n:(n+1), :])).mean() for label in unique_labels if label != labels[n]]))
+    if any((labels == labels[n]) & (idx != n)) and \
+       any(labels == label for label in unique_labels if label != labels[n]):
 
-    if (b[-1] == 0) & (a[-1] == 0):
-      score.append(0)
-    elif (b[-1] == 0) & (a[-1] != 0):
-      score.append(-1)
-    elif (b[-1] != 0) & (a[-1] == 0):
-      score.append(1)
-    else:
-      score.append((b[-1] - a[-1]) / np.max([a[-1], b[-1]]))
+      a.append((distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n:(n+1), :])).mean())    
+      b.append(np.min([(distance_fn(data[labels == label, :], data[n:(n+1), :])).mean() for label in unique_labels if label != labels[n]]))
+    
+      if (b[-1] == 0) & (a[-1] == 0):
+        score.append(0)
+      elif (b[-1] == 0) & (a[-1] != 0):
+        score.append(-1)
+      elif (b[-1] != 0) & (a[-1] == 0):
+        score.append(1)
+      else:
+        score.append((b[-1] - a[-1]) / np.max([a[-1], b[-1]]))
 
-  score = np.mean(score)
+  score = np.mean(score) if len(score) > 0 else 0
 
   return score
 
