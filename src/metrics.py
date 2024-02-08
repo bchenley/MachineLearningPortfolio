@@ -62,9 +62,10 @@ def silhouette_score_(data, labels, distance = 'euclidean', greater_is_better = 
   b = []
   score = []
   for n in range(data.shape[0]):
-    if any((labels == labels[n]) & (idx != n)) and \
-       any(labels == label for label in unique_labels if label != labels[n]):
 
+    if any((labels == labels[n]) & (idx != n)) and \
+       any(any(labels == label) for label in unique_labels if label != labels[n]):
+       
       a.append((distance_fn(data[(labels == labels[n]) & (idx != n), :], data[n:(n+1), :])).mean())    
       b.append(np.min([(distance_fn(data[labels == label, :], data[n:(n+1), :])).mean() for label in unique_labels if label != labels[n]]))
     
