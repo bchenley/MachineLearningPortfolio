@@ -6,15 +6,16 @@ import matplotlib.pyplot as plt
 def describe(df, missing_values = []):
 
   df = df.copy()
-  df_mode = df.mode(axis = 0).apply(lambda x: ', '.join(x.dropna().astype(str)), axis = 0)
   
+  dfd_T = df.describe(include = 'all').T[['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']]
+  
+  df_mode = df.mode(axis = 0).apply(lambda x: ', '.join(x.dropna().astype(str)), axis = 0)
+
   skew_fn = lambda x: stats.skew(x) if pd.api.types.is_numeric_dtype(x) else np.nan
 
   df_ = pd.concat([df_mode, df.apply(skew_fn) , df.dtypes, df.nunique()], axis = 1)
   df_.columns = ['mode', 'skew', 'dtype', 'cardinality']
 
-  dfd_T = df.describe().T[['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']]
-  
   df_ = pd.merge(dfd_T, df_, how = 'right', left_index = True, right_index = True)
 
   missing_values = missing_values
