@@ -309,9 +309,6 @@ class CustomSequential(torch.nn.Module):
                                               coef_reg = self.layer_coef_reg[i], 
                                               zero_order = self.layer_zero_order[i], 
                                               device = self.device, dtype = self.dtype))
-      
-    else:
-      self.activation_fn = torch.nn.Identity()
 
   def forward(self, input):
     output = self.sequential(input)
