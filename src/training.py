@@ -3,6 +3,82 @@ import pytorch_lightning as pl
 import numpy as np
 import pandas as pd
 
+def torch_train(model, criterion, optimizer,
+                dl_train,
+                dl_val = None,
+                epochs = 10,
+                hiddens = False):
+
+  criterion_name = str(criterion).split('()')[0]
+
+  train_loss_history = []
+  val_loss_history = []
+
+  for epoch in range(epochs):
+
+    train_loss = []
+    for X_train, y_train in dl_train:
+
+      if hiddens is False:
+
+        y_train_pred = model(X_train)
+
+      else:
+        if isinstance(hiddens, tuple):
+          hiddens = [h[:, :X_train.shape[0]].contiguous() for h in hiddens]
+        else:
+          hiddens = None
+
+        y_train_pred, hiddens = model(X_train, hiddens = hiddens)
+
+      train_loss_batch = criterion(y_train_pred, y_train)
+
+      optimizer.zero_grad()
+      train_loss_batch.sum().backward()
+      optimizer.step()
+
+      train_loss.append(train_loss_batch.sum().detach().item())
+
+      if hiddens is not None:
+        hiddens = [h.detach() for h in hiddens]
+
+    val_loss = []
+    if dl_val is not None:
+      for X_val, y_val in dl_val:
+
+        if hiddens is False:
+
+          y_val_pred = model(X_val)
+
+        else:
+
+          if isinstance(hiddens, tuple):
+            hiddens = [h[:, :X_val.shape[0]].contiguous() for h in hiddens]
+          else:
+            hiddens = None
+
+          y_val_pred, hiddens = model(X_val, hiddens = hiddens)
+
+
+        val_loss_batch = criterion(y_val_pred, y_val)
+
+        val_loss.append(val_loss_batch.sum().detach().item())
+
+      if hiddens:
+        hiddens = None
+
+    train_loss_history.append(np.mean(train_loss))
+
+    if len(val_loss) > 0:
+      val_loss_history.append(np.mean(val_loss))
+
+      print(f"Epoch {epoch+1}/{epochs}: Training {criterion_name} = {train_loss_history[-1].round(4)}" \
+              f" Validation {criterion_name} = {val_loss_history[-1].round(4)}")
+    else:
+      print(f"Epoch {epoch+1}/{epochs}: Training {criterion_name} = {train_loss_history[-1].round(4)}")
+
+  return train_loss_history, val_loss_history
+                    
 class CustomRegressionTrainer(pl.Trainer):
     def __init__(self, 
                  max_epochs = None):
