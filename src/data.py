@@ -63,7 +63,7 @@ def transform_data(X, transformer):
     device, dtype = X.device, X.dtype
     X = X.detach().cpu().numpy()
 
-  X_transformed = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
+  X_transformed = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape)
 
   if was_tensor:
     X_transformed = torch.tensor(X_transformed).to(device = device, dtype = dtype)
@@ -77,7 +77,7 @@ def inverse_transform_data(X, transformer):
     was_tensor = True
     X = X.detach().cpu().numpy()
 
-  X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
+  X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape)
 
   if was_tensor:
     X_inv = torch.tensor(X_inv).to(device = device, dtype = dtype)
