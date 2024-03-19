@@ -1,5 +1,5 @@
 from data import transform_data, inverse_transform_data
-from torch
+import torch
 
 def torch_predict(model, X, 
                   hiddens = False,
