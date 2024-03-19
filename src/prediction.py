@@ -1,13 +1,14 @@
 from data import transform_data, inverse_transform_data
+from torch
 
-def predict(model, X, 
-            hiddens = False,
-            X_transformer = None,
-            y_transformer = None):
+def torch_predict(model, X, 
+                  hiddens = False,
+                  X_transformer = None,
+                  y_transformer = None):
 
   if X_transformer is not None:
     X = transform_data(X, X_transformer)
-
+            
   with torch.no_grad():
     if hiddens is False:
       y_pred = model(X)
