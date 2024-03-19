@@ -56,21 +56,32 @@ def extract_window_horizon(df,
   return X, y, t_X, t_y
 
 def transform_data(X, transformer):
-  
+
+  was_tensor, device, dtype = False, None, None
   if isinstance(X, torch.Tensor):
+    was_tensor = True
+    device, dtype = X.device, X.dtype
     X = X.detach().cpu().numpy()
 
-  X_inv = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
-  
-  return X_inv
+  X_transformed = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
+
+  if was_tensor:
+    X_transformed = torch.tensor(X_transformed).to(device = device, dtype = dtype)
+    
+  return X_transformed
 
 def inverse_transform_data(X, transformer):
 
+  was_tensor, device, dtype = False, None, None
   if isinstance(X, torch.Tensor):
+    was_tensor = True
     X = X.detach().cpu().numpy()
 
   X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
-  
+
+  if was_tensor:
+    X_inv = torch.tensor(X_inv).to(device = device, dtype = dtype)
+    
   return X_inv
   
 class BasicDataset(torch.utils.data.Dataset):
