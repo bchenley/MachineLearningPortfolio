@@ -1,4 +1,4 @@
-from . import transform_data, inverse_transform_data
+from data import transform_data, inverse_transform_data
 
 def predict(model, X, 
             hiddens = False,
