@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import pandas as pd
 
 def extract_window_horizon(df,
@@ -53,7 +54,25 @@ def extract_window_horizon(df,
   t_y = np.array(t_y)
 
   return X, y, t_X, t_y
-                               
+
+def transform_data(X, transformer):
+  
+  if isinstance(X, torch.Tensor):
+    X = X.detach().cpu().numpy()
+
+  X_inv = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
+  
+  return X_inv
+
+def inverse_transform_data(X, transformer):
+
+  if isinstance(X, torch.Tensor):
+    X = X.detach().cpu().numpy()
+
+  X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).squeeze()
+  
+  return X_inv
+  
 class BasicDataset(torch.utils.data.Dataset):
     def __init__(self, 
                  X, y, 
