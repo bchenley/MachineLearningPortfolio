@@ -9,7 +9,7 @@ class CustomCNN1D(torch.nn.Module):
                  in_channels, out_channels, input_len = 1,
                  causal_pad = False,
                  kernel_size = [(1,)], kernel_stride = [(1,)], padding = [(0,)], 
-                 dilation = [(1,)], groups = [1], bias = [False], 
+                 dilation = [(1,)], groups = [1], bias = [True], 
                  pool_type = [None], pool_size = [(2,)], pool_stride = [(1,)],
                  activation = ['identity'],
                  degree = [2], coef_init = [None], coef_train = [True], coef_reg = [[0.001, 1]] , zero_order = [False],
