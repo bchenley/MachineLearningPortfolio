@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 ## 1D CNN
-class CNN1D(torch.nn.Module):
+class CustomCNN1D(torch.nn.Module):
 
     def __init__(self, 
                  in_channels, out_channels, input_len = 1,
@@ -17,7 +17,7 @@ class CNN1D(torch.nn.Module):
                  dropout_p = [0.],
                  device = None, dtype = None):
 
-        super(CNN1D, self).__init__()
+        super(CustomCNN1D, self).__init__()
         
         # Store the arguments as attributes
         locals_ = locals().copy()
