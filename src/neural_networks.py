@@ -204,12 +204,20 @@ class CustomCNN2D(torch.nn.Module):
                 batch_norm_i = torch.nn.Identity()
             
             self.cnn[-1].append(batch_norm_i)
-
+            
             # 3) Add activation
+            if isinstance(self.activation[i], torch.nn.Module):
+              pass
             if (self.activation[i] == 'identity') or (self.activation[i] is None):
               activation_fn = torch.nn.Identity()
             elif self.activation[i] == 'relu':
               activation_fn = torch.nn.ReLU()
+            elif self.activation[i] == 'sigmoid':
+              activation_fn = torch.nn.Sigmoid()
+            elif self.activation[i] == 'softmax':
+              activation_fn = torch.nn.Softmax(dim = -1)
+            elif self.activation[i] == 'tanh':
+              activation_fn = torch.nn.Tanh()  
             elif self.activation[i] == 'polynomial':
               activation_fn = Polynomial(in_features = self.out_channels[i],
                                          degree = self.degree[i],
