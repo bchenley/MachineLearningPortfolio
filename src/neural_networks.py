@@ -134,15 +134,16 @@ class CustomCNN1D(torch.nn.Module):
 class CustomCNN2D(torch.nn.Module):
     
   def __init__(self, 
-              in_channels, out_channels,
-              kernel_size = [(3, 3)], kernel_stride = [(1, 1)], padding = ['same'], 
-              dilation = [(1, 1)], groups = [1], bias = [True], 
-              pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
-              activation = ['identity'],
-              degree = [2], coef_init = [None], coef_train = [True], coef_reg = [[0.001, 1]] , zero_order = [False],
-              batch_norm = False, batch_norm_learn = False,
-              dropout_p = [0.],
-              device = None, dtype = None):
+               in_channels, out_channels,
+               input_height_width = (224, 224),
+               kernel_size = [(3, 3)], kernel_stride = [(1, 1)], padding = ['same'], 
+               dilation = [(1, 1)], groups = [1], bias = [True], 
+               pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
+               activation = ['identity'],
+               degree = [2], coef_init = [None], coef_train = [True], coef_reg = [[0.001, 1]] , zero_order = [False],
+               batch_norm = False, batch_norm_learn = False,
+               dropout_p = [0.],
+               device = None, dtype = None):
 
       super(CustomCNN2D, self).__init__()
       
@@ -175,15 +176,15 @@ class CustomCNN2D(torch.nn.Module):
       # Create the CNN layers
       self.cnn = torch.nn.ModuleList()  
 
-      X_temp = torch.empty((0, self.in_channels, 0, 0)).to(device = device, 
-                                                           dtype = dtype)
+      X_temp = torch.empty((0, self.in_channels, input_height_width[0], input_height_width[1])).to(device = device, 
+                                                                                                   dtype = dtype)
 
       for i in range(self.num_layers):
 
           self.cnn.append(torch.nn.Sequential())
           
           # Determine the input channels for the current layer
-          in_channels_i = X_temp.shape[-1] # self.in_channels if i == 0 else self.out_channels[i - 1]
+          in_channels_i = X_temp.shape[1] # self.in_channels if i == 0 else self.out_channels[i - 1]
 
           # 1) Add Conv2d layer to the current layer
           self.cnn[-1].append(torch.nn.Conv2d(in_channels = in_channels_i,
@@ -250,9 +251,9 @@ class CustomCNN2D(torch.nn.Module):
             self.cnn[-1].append(torch.nn.Identity())
           
           # Update the input shape for the next layer
-          print(f"Before {X_temp.shape}")
+          # print(f"{i+1} Before {X_temp.shape}")
           X_temp = self.cnn[-1](X_temp)
-          print(f"After {X_temp.shape}")
+          # print(f"{i+1} After {X_temp.shape}")
 
   def forward(self, input):
 
