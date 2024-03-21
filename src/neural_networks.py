@@ -242,7 +242,10 @@ class CustomCNN2D(torch.nn.Module):
           self.cnn[-1].append(pool_i)
 
           # 5) Dropout
-          self.cnn[-1].append(torch.nn.Dropout(self.dropout_p[i]))
+          if self.dropout_p[i] > 0.:
+            self.cnn[-1].append(torch.nn.Dropout(self.dropout_p[i]))
+          else:
+            self.cnn[-1].append(torch.nn.Identity())
 
   def forward(self, input):
 
