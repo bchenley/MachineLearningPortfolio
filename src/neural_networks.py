@@ -252,7 +252,7 @@ class CustomCNN2D(torch.nn.Module):
     output = input.clone()
     for i in range(self.num_layers):   
       # Apply the current CNN layer to the input tensor
-      output = self.cnn[i][0](output)
+      output = self.cnn[i][0](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
       # Apply batch normalization
       output = self.cnn[i][1](output)
       # Apply activation
