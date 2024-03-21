@@ -238,7 +238,7 @@ class CustomCNN2D(torch.nn.Module):
           elif self.pool_type[i] == 'avg':
               pool_i = torch.nn.AvgPool2d(kernel_size = self.pool_size[i],
                                           stride = self.pool_stride[i])     
-
+ 
           self.cnn[-1].append(pool_i)
 
           # 5) Dropout
