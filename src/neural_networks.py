@@ -400,6 +400,7 @@ class CustomFNN(torch.nn.Module):
                layer_batch_norm = [False],
                regularize_linear = False,
                regularize_activation = False,
+               flatten = True,
                device = 'cpu', dtype = torch.float32):
   
     super(CustomFNN, self).__init__()
@@ -454,8 +455,10 @@ class CustomFNN(torch.nn.Module):
 
   def forward(self, input):
 
-    input = input.to(device = self.device, dtype = self.dtype)
-      
+    if self.flatten:
+      input = torch.flatten(input.to(device = self.device, dtype = self.dtype), 
+                            start_dim = 1)
+    
     output = self.fnn(input)
       
     return output
