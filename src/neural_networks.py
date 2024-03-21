@@ -174,11 +174,16 @@ class CustomCNN2D(torch.nn.Module):
           
       # Create the CNN layers
       self.cnn = torch.nn.ModuleList()  
+
+      X_temp = torch.empty((0, self.in_channels, 0, 0)).to(device = device, 
+                                                           dtype = dtype)
+
       for i in range(self.num_layers):
+
           self.cnn.append(torch.nn.Sequential())
           
           # Determine the input channels for the current layer
-          in_channels_i = self.in_channels if i == 0 else self.out_channels[i - 1]
+          in_channels_i = X_temp.shape[-1] # self.in_channels if i == 0 else self.out_channels[i - 1]
 
           # 1) Add Conv2d layer to the current layer
           self.cnn[-1].append(torch.nn.Conv2d(in_channels = in_channels_i,
@@ -216,13 +221,13 @@ class CustomCNN2D(torch.nn.Module):
             activation_fn = torch.nn.Tanh()  
           elif self.activation[i] == 'polynomial':
             activation_fn = Polynomial(in_features = self.out_channels[i],
-                                        degree = self.degree[i],
-                                        coef_init = self.coef_init[i],
-                                        coef_train = self.coef_train[i],
-                                        coef_reg = self.coef_reg[i],
-                                        zero_order = self.zero_order[i],
-                                        device = self.device,
-                                        dtype = self.dtype)
+                                       degree = self.degree[i],
+                                       coef_init = self.coef_init[i],
+                                       coef_train = self.coef_train[i],
+                                       coef_reg = self.coef_reg[i],
+                                       zero_order = self.zero_order[i],
+                                       device = self.device,
+                                       dtype = self.dtype)
           
           self.cnn[-1].append(activation_fn)
           
@@ -243,13 +248,21 @@ class CustomCNN2D(torch.nn.Module):
             self.cnn[-1].append(torch.nn.Dropout(self.dropout_p[i]))
           else:
             self.cnn[-1].append(torch.nn.Identity())
+          
+          # Update the input shape for the next layer
+          print(f"Before {X_temp.shape}")
+          X_temp = self.cnn[-1](X_temp)
+          print(f"After {X_temp.shape}")
 
   def forward(self, input):
 
       output = input.clone()
       for i in range(self.num_layers):   
-        for cnn in self.cnn:
-          output = cnn(output)
+        for j, cnn in enumerate(self.cnn[i]):
+          if j == 2: 
+            output = cnn(output.permute(0, 3, 2, 1)).permute(0, 3, 2, 1)
+          else:
+            output = cnn(output)
     
       return output
       
