@@ -135,9 +135,9 @@ class CustomCNN1D(torch.nn.Module):
 
 # 2D CNN
 class CustomCNN2D(torch.nn.Module):
-
+    
     def __init__(self, 
-                 in_channels, out_channels, input_len = 1,
+                 in_channels, out_channels,
                  causal_pad = False,
                  kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = [(0, 0)], 
                  dilation = [(1, 1)], groups = [1], bias = [True], 
@@ -244,11 +244,6 @@ class CustomCNN2D(torch.nn.Module):
 
             # 5) Dropout
             self.cnn[-1].append(torch.nn.Dropout(self.dropout_p[i]))
-                     
-        # Determine the number of output features after passing through the layers
-        with torch.no_grad():             
-          X = torch.zeros((2, self.input_len, in_channels)).to(device = self.device, dtype = self.dtype)
-          self.output_len = self.forward(X).shape[1]
             
 ## Custom RNN network
 class CustomRNN(torch.nn.Module):
