@@ -1,4 +1,4 @@
-from data import transform_data, inverse_transform_data
+from preprocessing import transform_data, inverse_transform_data
 import torch
 
 def torch_predict(model, X, 
