@@ -135,7 +135,7 @@ class CustomCNN2D(torch.nn.Module):
     
   def __init__(self, 
               in_channels, out_channels,
-              kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = ['same'], 
+              kernel_size = [(3, 3)], kernel_stride = [(1, 1)], padding = ['same'], 
               dilation = [(1, 1)], groups = [1], bias = [True], 
               pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
               activation = ['identity'],
