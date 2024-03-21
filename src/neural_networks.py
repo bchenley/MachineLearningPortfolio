@@ -113,7 +113,7 @@ class CustomCNN1D(torch.nn.Module):
     
     def forward(self, input):
             
-        output = input.clone().to(device = self.device, dtype = self.dtype)
+        output = input.to(device = self.device, dtype = self.dtype)
         for i in range(self.num_layers):   
           # Apply padding to the input tensor if causal_pad is True
           input_i = torch.nn.functional.pad(output, (0, 0, self.kernel_size[i][0] - 1, 0, 0, 0)) if self.causal_pad else output
@@ -257,7 +257,7 @@ class CustomCNN2D(torch.nn.Module):
 
   def forward(self, input):
 
-      output = input.clone().to(device = self.device, dtype = self.dtype)
+      output = input.to(device = self.device, dtype = self.dtype)
       
       for i in range(self.num_layers):   
         for j, cnn in enumerate(self.cnn[i]):
@@ -348,7 +348,7 @@ class CustomRNN(torch.nn.Module):
       if not isinstance(input, torch.Tensor):
         input = torch.tensor(input).to(device = self.device, dtype = self.dtype)
       else:
-        input = input.clone().to(device = self.device, dtype = self.dtype)
+        input = input.to(device = self.device, dtype = self.dtype)
       
       if not self.stateful:
         hiddens = None
@@ -454,7 +454,7 @@ class CustomFNN(torch.nn.Module):
 
   def forward(self, input):
 
-    input = input.clone().to(device = self.device, dtype = self.dtype)
+    input = input.to(device = self.device, dtype = self.dtype)
       
     output = self.fnn(input)
       
@@ -517,7 +517,7 @@ class LinearActivationClassifier(torch.nn.Module):
             
     def forward(self, input):
 
-        input = input.clone().to(device = self.device, dtype = self.dtype)
+        input = input.to(device = self.device, dtype = self.dtype)
 
         output = self.sequential(input).to(device = self.device, dtype = self.dtype)
 
