@@ -454,7 +454,7 @@ class CustomFNN(torch.nn.Module):
 
   def forward(self, input):
 
-    input = input.copy().to(device = self.device, dtype = self.dtype)
+    input = input.clone().to(device = self.device, dtype = self.dtype)
       
     output = self.fnn(input)
       
