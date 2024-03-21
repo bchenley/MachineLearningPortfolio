@@ -521,7 +521,7 @@ class LinearActivationClassifier(torch.nn.Module):
 
 class Polynomial(nn.Module):
     def __init__(self, degree = 1, coef_init = None, coef_train = True,
-                 coef_reg = [0.001, 1], zero_order = True, dim = 1,
+                 coef_reg = [0.001, 1], zero_order = True, dim = -1,
                  device = 'cpu', dtype = torch.float32):
         super(Polynomial, self).__init__()
         
