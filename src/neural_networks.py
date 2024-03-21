@@ -313,20 +313,20 @@ class CustomRNN(torch.nn.Module):
                                    bidirectional = self.rnn_bidirectional,       
                                    device = self.device, dtype = self.X_dtype)
 
-        self.output_block = FullyConnectLayers(in_features = self.hidden_size, 
-                                             layer_out_features  = self.output_out_features, 
-                                             layer_bias  = self.output_bias, 
-                                             layer_weight_reg  = self.output_weight_reg, 
-                                             layer_activation  = self.output_activation, 
-                                             layer_degree  = self.output_degree, 
-                                             layer_coef_init  = self.output_coef_init, 
-                                             layer_coef_train  = self.output_coef_train, 
-                                             layer_coef_reg  = self.output_coef_reg, 
-                                             layer_zero_order  = self.output_zero_order, 
-                                             layer_batch_norm  = self.output_batch_norm, 
-                                             regularize_linear  = self.output_regularize_linear, 
-                                             regularize_activation  = self.output_regularize_activation, 
-                                             device  = self.device, dtype  = self.X_dtype)
+        self.output_block = CustomFNN(in_features = self.hidden_size, 
+                                     layer_out_features  = self.output_out_features, 
+                                     layer_bias  = self.output_bias, 
+                                     layer_weight_reg  = self.output_weight_reg, 
+                                     layer_activation  = self.output_activation, 
+                                     layer_degree  = self.output_degree, 
+                                     layer_coef_init  = self.output_coef_init, 
+                                     layer_coef_train  = self.output_coef_train, 
+                                     layer_coef_reg  = self.output_coef_reg, 
+                                     layer_zero_order  = self.output_zero_order, 
+                                     layer_batch_norm  = self.output_batch_norm, 
+                                     regularize_linear  = self.output_regularize_linear, 
+                                     regularize_activation  = self.output_regularize_activation, 
+                                     device  = self.device, dtype  = self.X_dtype)
 
     def forward(self, input, hiddens = None):
 
@@ -371,7 +371,7 @@ class CustomRNN(torch.nn.Module):
       return penalty
 
 ## Custom module employing multiple layers of linear transformation with nonlinear activation
-class FullyConnectLayers(torch.nn.Module):
+class CustomFNN(torch.nn.Module):
   def __init__(self,
                in_features, layer_out_features = [1],
                layer_bias = [True],
@@ -387,7 +387,7 @@ class FullyConnectLayers(torch.nn.Module):
                regularize_activation = False,
                device = 'cpu', dtype = torch.float32):
   
-    super(FullyConnectLayers, self).__init__()
+    super(CustomFNN, self).__init__()
     
     # Store the arguments as attributes
     locals_ = locals().copy()
