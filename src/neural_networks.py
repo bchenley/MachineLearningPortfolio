@@ -373,7 +373,7 @@ class CustomRNN(torch.nn.Module):
 ## Custom module employing multiple layers of linear transformation with nonlinear activation
 class CustomFNN(torch.nn.Module):
   def __init__(self,
-               in_features, out_features = [1],
+               in_features, layer_out_features = [1],
                layer_bias = [True],
                layer_weight_reg = [0.001, 1],
                layer_activation = ['relu'],
@@ -395,41 +395,41 @@ class CustomFNN(torch.nn.Module):
       if arg != 'self':
         if 'layer_' in arg:
           if len(locals_[arg]) == 1:
-            locals_[arg] = locals_[arg] * len(out_features)
+            locals_[arg] = locals_[arg] * len(layer_out_features)
           
         setattr(self, arg, locals_[arg])
     
-    self.num_layers = len(self.out_features)
+    self.num_layers = len(self.layer_out_features)
 
-    self.sequential = torch.nn.Sequential()
+    self.fnn = torch.nn.Sequential()
     for i in range(self.num_layers):
       if i == 0:
         in_features = self.in_features
       else:
-        in_features = self.out_features[i-1]
+        in_features = self.layer_out_features[i-1]
 
-      self.sequential.add_module('linear_' + str(i+1),
+      self.fnn.add_module('linear_' + str(i+1),
                                  torch.nn.Linear(in_features = in_features, 
-                                                 out_features = self.out_features[i],
+                                                 out_features = self.layer_out_features[i],
                                                  bias = self.layer_bias[i],
                                                  device = self.device, dtype = self.dtype))
       if self.layer_batch_norm[i]:
-        self.sequential.add_module('batch_norm_' + str(i+1),
-                                  torch.nn.BatchNorm1d(num_features = self.out_features[i],
+        self.fnn.add_module('batch_norm_' + str(i+1),
+                                  torch.nn.BatchNorm1d(num_features = self.layer_out_features[i],
                                                        device = self.device, dtype = self.dtype))
 
       if self.layer_activation[i] == 'relu':
-        self.sequential.add_module('activation_' + str(i+1),
+        self.fnn.add_module('activation_' + str(i+1),
                                    torch.nn.ReLU())
       elif self.layer_activation[i] == 'softmax':
-        self.sequential.add_module('activation_' + str(i+1),
+        self.fnn.add_module('activation_' + str(i+1),
                                    torch.nn.Softmax(dim = -1))
       elif self.layer_activation[i] == 'sigmoid':
-        self.sequential.add_module('activation_' + str(i+1),
+        self.fnn.add_module('activation_' + str(i+1),
                                    torch.nn.Sigmoid())
       elif self.layer_activation[i] == 'polynomial':
-        self.sequential.add_module('activation_' + str(i+1),
-                                   Polynomial(in_features = self.out_features[i], 
+        self.fnn.add_module('activation_' + str(i+1),
+                                   Polynomial(in_features = self.layer_out_features[i], 
                                               degree = self.layer_degree[i], 
                                               coef_init = self.layer_coef_init[i], 
                                               coef_train = self.layer_coef_train[i],
@@ -438,7 +438,9 @@ class CustomFNN(torch.nn.Module):
                                               device = self.device, dtype = self.dtype))
 
   def forward(self, input):
-    output = self.sequential(input)
+    
+    output = self.fnn(input)
+      
     return output
 
   def penalty_score(self):
@@ -446,12 +448,12 @@ class CustomFNN(torch.nn.Module):
     
     penalty = 0.
     if self.regularize_linear:
-      for name, param in self.sequential.named_parameters():
+      for name, param in self.fnn.named_parameters():
         if ('linear' in name) & ('weight' in name):
           penalty += penalty_fn(self.layer_weight_reg, param)
 
     if self.regularize_activation:      
-      for layer in self.sequential:
+      for layer in self.fnn:
         if layer.__class__.__name__ == 'Polynomial':
           penalty += layer.penalty_score()
 
