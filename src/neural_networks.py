@@ -112,8 +112,8 @@ class CustomCNN1D(torch.nn.Module):
           self.output_len = self.forward(X).shape[1]
     
     def forward(self, input):
-
-        output = input.clone()
+            
+        output = input.clone().to(device = self.device, dtype = self.dtype)
         for i in range(self.num_layers):   
           # Apply padding to the input tensor if causal_pad is True
           input_i = torch.nn.functional.pad(output, (0, 0, self.kernel_size[i][0] - 1, 0, 0, 0)) if self.causal_pad else output
@@ -257,7 +257,8 @@ class CustomCNN2D(torch.nn.Module):
 
   def forward(self, input):
 
-      output = input.clone()
+      output = input.clone().to(device = self.device, dtype = self.dtype)
+      
       for i in range(self.num_layers):   
         for j, cnn in enumerate(self.cnn[i]):
           if j == 2: 
@@ -343,11 +344,11 @@ class CustomRNN(torch.nn.Module):
                                      device  = self.device, dtype  = self.X_dtype)
 
     def forward(self, input, hiddens = None):
-
+    
       if not isinstance(input, torch.Tensor):
-        input = torch.tensor(input).to(self.device, self.X_dtype)
+        input = torch.tensor(input).to(device = self.device, dtype = self.dtype)
       else:
-        input = input.clone().to(self.device, self.X_dtype)
+        input = input.clone().to(device = self.device, dtype = self.dtype)
       
       if not self.stateful:
         hiddens = None
@@ -452,7 +453,9 @@ class CustomFNN(torch.nn.Module):
                                               device = self.device, dtype = self.dtype))
 
   def forward(self, input):
-    
+
+    input = input.copy().to(device = self.device, dtype = self.dtype)
+      
     output = self.fnn(input)
       
     return output
@@ -514,22 +517,22 @@ class LinearActivationClassifier(torch.nn.Module):
             
     def forward(self, input):
 
-        input = input.clone().to(self.device, self.X_dtype)
+        input = input.clone().to(device = self.device, dtype = self.dtype)
 
-        output = self.sequential(input).to(self.y_dtype)
+        output = self.sequential(input).to(device = self.device, dtype = self.dtype)
 
         return output
     
     def predict_proba(self, input):
 
         with torch.no_grad():
-            output = self.sequential(input).to(self.y_dtype)
+            output = self.sequential(input).to(device = self.device, dtype = self.dtype)
         
         return output
 
     def predict(self, input, threshold = 0.5):
 
-        output = self.predict_proba(input).to(int)
+        output = self.predict_proba(input).to(device = self.device, dtype = self.dtype)
         
         return output
 
