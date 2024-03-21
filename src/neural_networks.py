@@ -127,9 +127,6 @@ class CustomCNN1D(torch.nn.Module):
           output = self.cnn[i][3](output.permute(0, 2, 1)).permute(0, 2, 1)
           # Apply dropout
           output = self.cnn[i][4](output)
-          
-        # Transpose back the output tensor to the original shape
-        output = output
 
         return output
 
@@ -254,17 +251,16 @@ class CustomCNN2D(torch.nn.Module):
       # Apply the current CNN layer to the input tensor
       output = self.cnn[i][0](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
       # Apply batch normalization
-      output = self.cnn[i][1](output)
+      output = self.cnn[i][1](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
       # Apply activation
-      output = self.cnn[i][2](output)
+      output = self.cnn[i][2](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
       # Apply pooling
-      output = self.cnn[i][3](output)
+      output = self.cnn[i][3](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
       # Apply dropout
       output = self.cnn[i][4](output)
-      
-    # Transpose back the output tensor to the original shape
-    output = output
 
+    return output
+      
   def predict(self, input):
 
     with torch.no_grad():
