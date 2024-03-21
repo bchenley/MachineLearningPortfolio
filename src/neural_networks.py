@@ -134,15 +134,15 @@ class CustomCNN1D(torch.nn.Module):
 class CustomCNN2D(torch.nn.Module):
     
   def __init__(self, 
-                in_channels, out_channels,
-                kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = ['same'], 
-                dilation = [(1, 1)], groups = [1], bias = [True], 
-                pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
-                activation = ['identity'],
-                degree = [2], coef_init = [None], coef_train = [True], coef_reg = [[0.001, 1]] , zero_order = [False],
-                batch_norm = False, batch_norm_learn = False,
-                dropout_p = [0.],
-                device = None, dtype = None):
+              in_channels, out_channels,
+              kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = ['same'], 
+              dilation = [(1, 1)], groups = [1], bias = [True], 
+              pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
+              activation = ['identity'],
+              degree = [2], coef_init = [None], coef_train = [True], coef_reg = [[0.001, 1]] , zero_order = [False],
+              batch_norm = False, batch_norm_learn = False,
+              dropout_p = [0.],
+              device = None, dtype = None):
 
       super(CustomCNN2D, self).__init__()
       
