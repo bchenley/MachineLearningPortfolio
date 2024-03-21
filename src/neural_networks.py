@@ -314,7 +314,7 @@ class CustomRNN(torch.nn.Module):
                                    device = self.device, dtype = self.X_dtype)
 
         self.output_block = CustomFNN(in_features = self.hidden_size, 
-                                     layer_out_features  = self.output_out_features, 
+                                     out_features  = self.output_out_features, 
                                      layer_bias  = self.output_bias, 
                                      layer_weight_reg  = self.output_weight_reg, 
                                      layer_activation  = self.output_activation, 
@@ -373,7 +373,7 @@ class CustomRNN(torch.nn.Module):
 ## Custom module employing multiple layers of linear transformation with nonlinear activation
 class CustomFNN(torch.nn.Module):
   def __init__(self,
-               in_features, layer_out_features = [1],
+               in_features, out_features = [1],
                layer_bias = [True],
                layer_weight_reg = [0.001, 1],
                layer_activation = ['relu'],
@@ -395,27 +395,27 @@ class CustomFNN(torch.nn.Module):
       if arg != 'self':
         if 'layer_' in arg:
           if len(locals_[arg]) == 1:
-            locals_[arg] = locals_[arg] * len(layer_out_features)
+            locals_[arg] = locals_[arg] * len(out_features)
           
         setattr(self, arg, locals_[arg])
     
-    self.num_layers = len(self.layer_out_features)
+    self.num_layers = len(self.out_features)
 
     self.sequential = torch.nn.Sequential()
     for i in range(self.num_layers):
       if i == 0:
         in_features = self.in_features
       else:
-        in_features = self.layer_out_features[i-1]
+        in_features = self.out_features[i-1]
 
       self.sequential.add_module('linear_' + str(i+1),
                                  torch.nn.Linear(in_features = in_features, 
-                                                 out_features = self.layer_out_features[i],
+                                                 out_features = self.out_features[i],
                                                  bias = self.layer_bias[i],
                                                  device = self.device, dtype = self.dtype))
       if self.layer_batch_norm[i]:
         self.sequential.add_module('batch_norm_' + str(i+1),
-                                  torch.nn.BatchNorm1d(num_features = self.layer_out_features[i],
+                                  torch.nn.BatchNorm1d(num_features = self.out_features[i],
                                                        device = self.device, dtype = self.dtype))
 
       if self.layer_activation[i] == 'relu':
@@ -429,7 +429,7 @@ class CustomFNN(torch.nn.Module):
                                    torch.nn.Sigmoid())
       elif self.layer_activation[i] == 'polynomial':
         self.sequential.add_module('activation_' + str(i+1),
-                                   Polynomial(in_features = self.layer_out_features[i], 
+                                   Polynomial(in_features = self.out_features[i], 
                                               degree = self.layer_degree[i], 
                                               coef_init = self.layer_coef_init[i], 
                                               coef_train = self.layer_coef_train[i],
