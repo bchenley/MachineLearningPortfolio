@@ -135,7 +135,7 @@ class CustomCNN2D(torch.nn.Module):
     
   def __init__(self, 
                 in_channels, out_channels,
-                kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = [same], 
+                kernel_size = [(1, 1)], kernel_stride = [(1, 1)], padding = ['same'], 
                 dilation = [(1, 1)], groups = [1], bias = [True], 
                 pool_type = [None], pool_size = [(2, 2)], pool_stride = [(1, 1)],
                 activation = ['identity'],
@@ -246,20 +246,12 @@ class CustomCNN2D(torch.nn.Module):
 
   def forward(self, input):
 
-    output = input.clone()
-    for i in range(self.num_layers):   
-      # Apply the current CNN layer to the input tensor
-      output = self.cnn[i][0](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
-      # Apply batch normalization
-      output = self.cnn[i][1](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
-      # Apply activation
-      output = self.cnn[i][2](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
-      # Apply pooling
-      output = self.cnn[i][3](output.permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
-      # Apply dropout
-      output = self.cnn[i][4](output)
-
-    return output
+      output = input.clone()
+      for i in range(self.num_layers):   
+        for cnn in self.cnn:
+          output = cnn(output.permute(0, 3, 2, 1)).permute(0, 3, 2, 1)
+    
+      return output
       
   def predict(self, input):
 
