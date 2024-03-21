@@ -1,6 +1,41 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import FunctionTransformer, StandardScaler, MinMaxScaler
+from sklearn.preprocessing import FunctionTransformer, StandardScaler, MinMaxScaler, OneHotEncoder
+
+def transform_data(X, transformer):
+
+  was_tensor, device, dtype = False, None, None
+  if isinstance(X, torch.Tensor):
+    was_tensor = True
+    device, dtype = X.device, X.dtype
+    X = X.detach().cpu().numpy()
+
+  if isinstance(transformer, OneHotEncoder):
+    X_transformed = transformer.transform(X.reshape(-1, X.shape[-1])).toarray()
+  else:
+    X_transformed = transformer.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape)
+
+  if was_tensor:
+    X_transformed = torch.tensor(X_transformed).to(device = device, dtype = dtype)
+    
+  return X_transformed
+
+def inverse_transform_data(X, transformer):
+
+  was_tensor, device, dtype = False, None, None
+  if isinstance(X, torch.Tensor):
+    was_tensor = True
+    X = X.detach().cpu().numpy()
+
+  if isinstance(transformer, OneHotEncoder):
+    X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1]))
+  else:
+    X_inv = transformer.inverse_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape)
+
+  if was_tensor:
+    X_inv = torch.tensor(X_inv).to(device = device, dtype = dtype)
+    
+  return X_inv
 
 def log_transform(X, y = None, small_constant = 1.):  
   X_t = np.log(X - X.min() + small_constant)    
