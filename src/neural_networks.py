@@ -206,7 +206,7 @@ class CustomCNN2D(torch.nn.Module):
           
           # 3) Add activation
           if isinstance(self.activation[i], torch.nn.Module):
-            pass
+            activation_fn = self.activation[i]
           if (self.activation[i] == 'identity') or (self.activation[i] is None):
             activation_fn = torch.nn.Identity()
           elif self.activation[i] == 'relu':
