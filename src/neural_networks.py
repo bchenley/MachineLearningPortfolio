@@ -249,7 +249,7 @@ class CustomCNN2D(torch.nn.Module):
       output = input.clone()
       for i in range(self.num_layers):   
         for cnn in self.cnn:
-          output = cnn(output.permute(0, 3, 2, 1)).permute(0, 3, 2, 1)
+          output = cnn(output)
     
       return output
       
