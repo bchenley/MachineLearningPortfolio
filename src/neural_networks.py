@@ -313,7 +313,7 @@ class CustomRNN(torch.nn.Module):
                                    bidirectional = self.rnn_bidirectional,       
                                    device = self.device, dtype = self.X_dtype)
 
-        self.output_block = CustomSequential(in_features = self.hidden_size, 
+        self.output_block = FullyConnectLayers(in_features = self.hidden_size, 
                                              layer_out_features  = self.output_out_features, 
                                              layer_bias  = self.output_bias, 
                                              layer_weight_reg  = self.output_weight_reg, 
@@ -371,7 +371,7 @@ class CustomRNN(torch.nn.Module):
       return penalty
 
 ## Custom module employing multiple layers of linear transformation with nonlinear activation
-class CustomSequential(torch.nn.Module):
+class FullyConnectLayers(torch.nn.Module):
   def __init__(self,
                in_features, layer_out_features = [1],
                layer_bias = [True],
@@ -387,7 +387,7 @@ class CustomSequential(torch.nn.Module):
                regularize_activation = False,
                device = 'cpu', dtype = torch.float32):
   
-    super(CustomSequential, self).__init__()
+    super(FullyConnectLayers, self).__init__()
     
     # Store the arguments as attributes
     locals_ = locals().copy()
