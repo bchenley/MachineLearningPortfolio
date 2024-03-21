@@ -7,7 +7,9 @@ def torch_train(model, criterion, optimizer,
                 dl_train,
                 dl_val = None,
                 epochs = 10,
-                hiddens = False):
+                hiddens = False,
+                device = 'cpu', 
+                X_dtype = torch.float32, y_dtype = torch.float32):
 
   criterion_name = str(criterion).split('()')[0]
 
@@ -18,6 +20,9 @@ def torch_train(model, criterion, optimizer,
 
     train_loss = []
     for X_train, y_train in dl_train:
+
+      X_train = X_train.to(device = device, dtype = X_dtype)  
+      y_train = y_train.to(device = device, dtype = y_dtype)  
 
       if hiddens is False:
 
@@ -39,12 +44,15 @@ def torch_train(model, criterion, optimizer,
 
       train_loss.append(train_loss_batch.sum().detach().item())
 
-      if hiddens is not None:
+      if hiddens:
         hiddens = [h.detach() for h in hiddens]
 
     val_loss = []
     if dl_val is not None:
       for X_val, y_val in dl_val:
+
+        X_val = X_val.to(device = device, dtype = X_dtype)  
+        y_val = y_val.to(device = device, dtype = y_dtype)  
 
         if hiddens is False:
 
@@ -58,7 +66,6 @@ def torch_train(model, criterion, optimizer,
             hiddens = None
 
           y_val_pred, hiddens = model(X_val, hiddens = hiddens)
-
 
         val_loss_batch = criterion(y_val_pred, y_val)
 
