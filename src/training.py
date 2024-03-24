@@ -2,6 +2,7 @@ import torch
 import pytorch_lightning as pl
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def torch_train(model, criterion, optimizer,
                 dl_train,
