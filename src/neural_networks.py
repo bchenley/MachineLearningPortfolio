@@ -400,7 +400,7 @@ class CustomFNN(torch.nn.Module):
                layer_batch_norm = [False],
                regularize_linear = False,
                regularize_activation = False,
-               flatten = True,
+               flatten = False,
                device = 'cpu', dtype = torch.float32):
   
     super(CustomFNN, self).__init__()
