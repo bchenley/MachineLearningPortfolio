@@ -9,9 +9,8 @@ def describe(df, missing_values = []):
   
   dfd_T = df.describe(include = 'all').T[['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']]
   
-  df_mode = df.mode(axis = 0).median()
-  # mode_fn = lambda x: stats.mode(x)[0]
-
+  df_mode = df.apply(lambda x: x.mode().median() if pd.api.types.is_numeric_dtype(x) else x.mode()[0])
+  
   skew_fn = lambda x: stats.skew(x) if pd.api.types.is_numeric_dtype(x) and x.nunique() > 1 else np.nan
 
   df_ = pd.concat([df_mode, df.apply(skew_fn) , df.dtypes, df.nunique()], axis = 1)
